@@ -1,0 +1,50 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <h3>Identity Verification</h3>
+            <p class="mb-4">Complete the verification process to increase your trust score and gain access to premium features.</p>
+
+            <form class="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="alert alert-info" role="alert">
+                    <h5 class="mb-2">Why do we need verification?</h5>
+                    <p>Identity verification helps us maintain a trusted community of freelancers and clients. This creates a safer environment for all users and reduces fraud.</p>
+                    <h5 class="mt-3 mb-2">How we protect your data:</h5>
+                    <ul>
+                        <li>Your documents are stored securely and encrypted</li>
+                        <li>We only use your information for verification purposes</li>
+                        <li>Your personal information is never shared with other users</li>
+                    </ul>
+                </div>
+
+                {% for field in form %}
+                <div class="form__field">
+                    <label for="formInput#text">{{ field.label }}: </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <p style="color: red;">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <div class="alert alert-warning mt-3">
+                    <p><strong>Note:</strong> After submitting your documents, your verification status will change to "Pending Review." Our team will review your submission within 1-3 business days.</p>
+                </div>
+
+                <div class="form__field">
+                    <p>By submitting this form, you agree that the information and documents provided are true and accurate.</p>
+                </div>
+                
+                <input class="btn btn--main" type="submit" value="Submit Verification Documents" />
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock content %}

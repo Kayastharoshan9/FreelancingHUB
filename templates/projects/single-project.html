@@ -1,0 +1,489 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-page {
+        padding: 60px 0;
+        background-color: #f8f9fa;
+    }
+    
+    .project-header {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .project-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+    }
+    
+    .project-info {
+        padding: 30px;
+    }
+    
+    .project-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .project-meta {
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .project-meta-item {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .project-meta-item i {
+        margin-right: 5px;
+        color: #4a6cf7;
+    }
+    
+    .project-tags {
+        margin: 20px 0;
+    }
+    
+    .project-tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 5px 12px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border-radius: 30px;
+        font-size: 13px;
+    }
+    
+    .project-links {
+        margin-top: 20px;
+    }
+    
+    .project-link {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 15px;
+        background-color: #f8f9fa;
+        color: #495057;
+        border-radius: 5px;
+        margin-right: 10px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .project-link:hover {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .project-link i {
+        margin-right: 5px;
+    }
+    
+    .project-price {
+        font-size: 18px;
+        font-weight: 600;
+        color: #28a745;
+        margin-top: 10px;
+        display: inline-block;
+    }
+    
+    .project-content {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .project-description {
+        white-space: pre-line;
+        line-height: 1.6;
+    }
+    
+    .project-owner {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .owner-profile {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .owner-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    
+    .owner-info {
+        flex: 1;
+    }
+    
+    .owner-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .owner-intro {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .owner-meta {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .owner-action {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .owner-btn {
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    
+    .owner-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .owner-btn.contact {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .owner-btn.view {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+    
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #28a745;
+        color: white;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+        margin-left: 5px;
+    }
+    
+    .verified-badge i {
+        margin-right: 3px;
+    }
+    
+    .project-reviews {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .review-form {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 20px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .rating-display {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .stars {
+        color: #ffc107;
+        margin-right: 10px;
+    }
+    
+    .similar-projects {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .similar-project-card {
+        border: 1px solid #eee;
+        border-radius: 5px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .similar-project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .similar-project-img {
+        height: 150px;
+        object-fit: cover;
+        width: 100%;
+    }
+    
+    .similar-project-info {
+        padding: 15px;
+    }
+    
+    .similar-project-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .similar-project-owner {
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+    
+    @media (max-width: 768px) {
+        .project-image {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="project-page">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Project Header -->
+                <div class="project-header">
+                    <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="project-image">
+                    <div class="project-info">
+                        <h1 class="project-title">{{ project.title }}</h1>
+                        
+                        <div class="project-meta">
+                            <div class="project-meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ project.owner.name }}</span>
+                            </div>
+                            <div class="project-meta-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>{{ project.created|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="project-meta-item">
+                                <i class="fas fa-thumbs-up"></i>
+                                <span>{{ project.vote_ratio }}% Positive ({{ project.vote_total }} votes)</span>
+                            </div>
+                        </div>
+                        
+                        {% if project.tags.all %}
+                        <div class="project-tags">
+                            {% for tag in project.tags.all %}
+                            <span class="project-tag">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.price %}
+                        <div class="project-price">
+                            <i class="fas fa-dollar-sign"></i> {{ project.price }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="project-links">
+                            {% if project.demo_link %}
+                            <a href="{{ project.demo_link }}" target="_blank" class="project-link">
+                                <i class="fas fa-external-link-alt"></i> View Demo
+                            </a>
+                            {% endif %}
+                            
+                            {% if project.source_link %}
+                            <a href="{{ project.source_link }}" target="_blank" class="project-link">
+                                <i class="fas fa-code"></i> Source Code
+                            </a>
+                            {% endif %}
+                            
+                            {% if request.user == project.owner.user %}
+                            <a href="{% url 'update-project' project.id %}" class="project-link">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'delete-project' project.id %}" class="project-link">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project Description -->
+                <div class="project-content">
+                    <h2 class="section-title">Project Description</h2>
+                    <div class="project-description">
+                        {{ project.description }}
+                    </div>
+                </div>
+                
+                <!-- Project Reviews -->
+                <div class="project-reviews">
+                    <h2 class="section-title">Reviews ({{ project.reviews.count }})</h2>
+                    
+                    {% if project.reviews.all %}
+                    <div class="rating-display">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div>{{ project.vote_ratio }}% Positive Feedback</div>
+                    </div>
+                    
+                    {% for review in project.reviews.all %}
+                    <div class="review-item mb-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <strong>{{ review.owner.name }}</strong>
+                            <span class="ms-3 text-muted">{{ review.created|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="stars mb-2">
+                            {% if review.value == 'up' %}
+                            <i class="fas fa-thumbs-up text-success"></i>
+                            {% else %}
+                            <i class="fas fa-thumbs-down text-danger"></i>
+                            {% endif %}
+                        </div>
+                        <p>{{ review.body }}</p>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No reviews yet.</p>
+                    {% endif %}
+                    
+                    {% if request.user.is_authenticated and request.user != project.owner.user %}
+                    <div class="review-form">
+                        <h5>Leave a Review</h5>
+                        <form action="{% url 'project' project.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="form-label">{{ form.value.label }}</label>
+                                {{ form.value }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.body.id_for_label }}" class="form-label">{{ form.body.label }}</label>
+                                {{ form.body }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Review</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Project Owner -->
+                <div class="project-owner">
+                    <h3 class="section-title">Project by</h3>
+                    
+                    <div class="owner-profile">
+                        <img src="{{ project.owner.imageURL }}" alt="{{ project.owner.name }}" class="owner-img">
+                        <div class="owner-info">
+                            <div class="owner-name">
+                                {{ project.owner.name }}
+                                {% if project.owner.is_verified %}
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="owner-intro">{{ project.owner.short_intro }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="owner-meta">
+                        <div>
+                            <i class="fas fa-map-marker-alt text-danger"></i>
+                            {{ project.owner.location|default:"Location not specified" }}
+                        </div>
+                        <div>
+                            <i class="fas fa-user-circle text-primary"></i>
+                            Member since {{ project.owner.created|date:"M Y" }}
+                        </div>
+                    </div>
+                    
+                    <div class="owner-action">
+                        <a href="{% url 'create-message' project.owner.id %}" class="owner-btn contact">
+                            <i class="fas fa-envelope me-1"></i> Contact
+                        </a>
+                        <a href="{% url 'profile' project.owner.id %}" class="owner-btn view">
+                            <i class="fas fa-user me-1"></i> View Profile
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Similar Projects -->
+                <div class="similar-projects">
+                    <h3 class="section-title">Similar Projects</h3>
+                    
+                    {% if similar_projects %}
+                        {% for project in similar_projects %}
+                        <div class="similar-project-card mb-3">
+                            <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="similar-project-img">
+                            <div class="similar-project-info">
+                                <h5 class="similar-project-title">
+                                    <a href="{% url 'project' project.id %}" class="text-dark text-decoration-none">{{ project.title }}</a>
+                                </h5>
+                                <div class="similar-project-owner">By: {{ project.owner.name }}</div>
+                                
+                                {% if project.tags.all %}
+                                <div class="mt-2">
+                                    {% for tag in project.tags.all|slice:":3" %}
+                                    <span class="project-tag">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No similar projects found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %} 

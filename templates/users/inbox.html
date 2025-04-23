@@ -1,0 +1,62 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Inbox | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Messages</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'inbox' %}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-inbox me-2"></i> Inbox
+                        </a>
+                        <a href="{% url 'account' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">My Messages</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for message in messageRequests %}
+                    <a href="{% url 'message' message.id %}" class="list-group-item list-group-item-action{% if not message.is_read %} bg-light{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ message.sender.imageURL }}" alt="{{ message.sender.name }}" class="rounded-circle me-3" width="40" height="40">
+                                <div>
+                                    <h6 class="mb-0">{{ message.name }}</h6>
+                                    <p class="text-muted mb-0 small">{{ message.subject|truncatechars:50 }}</p>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">{{ message.created|date:"M d, Y" }}</small>
+                                {% if not message.is_read %}
+                                <span class="badge bg-primary ms-2">New</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% empty %}
+                    <div class="list-group-item text-center py-4">
+                        <i class="fas fa-envelope-open-text fa-2x text-muted mb-3"></i>
+                        <p class="mb-0">You have no messages yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

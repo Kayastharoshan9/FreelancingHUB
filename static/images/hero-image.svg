@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="0" y="0" width="600" height="400" fill="#f8f9fa" rx="10" ry="10"/>
+  
+  <!-- Laptop -->
+  <rect x="150" y="150" width="300" height="180" fill="#343a40" rx="10" ry="10"/>
+  <rect x="160" y="160" width="280" height="150" fill="#6c757d"/>
+  
+  <!-- Screen Content -->
+  <rect x="180" y="170" width="240" height="20" fill="#ffffff" rx="3" ry="3"/>
+  <rect x="180" y="200" width="120" height="90" fill="#ffffff" rx="3" ry="3"/>
+  <rect x="310" y="200" width="90" height="30" fill="#ffffff" rx="3" ry="3"/>
+  <rect x="310" y="240" width="90" height="50" fill="#ffffff" rx="3" ry="3"/>
+  
+  <!-- Documents/Portfolio -->
+  <rect x="420" y="100" width="80" height="110" fill="#ffffff" stroke="#dee2e6" stroke-width="2" rx="3" ry="3"/>
+  <rect x="430" y="110" width="60" height="10" fill="#6c757d"/>
+  <rect x="430" y="130" width="60" height="5" fill="#dee2e6"/>
+  <rect x="430" y="140" width="45" height="5" fill="#dee2e6"/>
+  <rect x="430" y="150" width="60" height="5" fill="#dee2e6"/>
+  <rect x="430" y="160" width="40" height="5" fill="#dee2e6"/>
+  
+  <rect x="440" y="120" width="90" height="110" fill="#ffffff" stroke="#dee2e6" stroke-width="2" rx="3" ry="3"/>
+  <rect x="450" y="130" width="70" height="10" fill="#6c757d"/>
+  <rect x="450" y="150" width="70" height="5" fill="#dee2e6"/>
+  <rect x="450" y="160" width="50" height="5" fill="#dee2e6"/>
+  <rect x="450" y="170" width="70" height="5" fill="#dee2e6"/>
+  <rect x="450" y="180" width="45" height="5" fill="#dee2e6"/>
+  
+  <!-- Person -->
+  <circle cx="100" cy="140" r="40" fill="#0d6efd"/>
+  <rect x="80" y="180" width="40" height="80" fill="#0d6efd" rx="10" ry="10"/>
+  <rect x="60" y="190" width="20" height="60" fill="#0d6efd" rx="10" ry="10"/>
+  <rect x="120" y="190" width="20" height="60" fill="#0d6efd" rx="10" ry="10"/>
+  
+  <!-- Money/Payment -->
+  <circle cx="85" cy="270" r="30" fill="#28a745"/>
+  <circle cx="85" cy="270" r="20" fill="#ffffff"/>
+  <text x="77" y="275" font-family="Arial" font-size="18" font-weight="bold" fill="#28a745">$</text>
+  
+  <!-- Stars/Reviews -->
+  <polygon points="500,280 510,300 530,300 515,315 520,335 500,325 480,335 485,315 470,300 490,300" fill="#ffc107"/>
+  <polygon points="460,250 465,260 475,260 467,268 470,278 460,273 450,278 453,268 445,260 455,260" fill="#ffc107"/>
+  <polygon points="530,250 535,260 545,260 537,268 540,278 530,273 520,278 523,268 515,260 525,260" fill="#ffc107"/>
+  
+  <!-- Connection Lines -->
+  <line x1="140" y1="160" x2="150" y2="170" stroke="#6c757d" stroke-width="2"/>
+  <line x1="120" y1="220" x2="150" y2="230" stroke="#6c757d" stroke-width="2"/>
+  <line x1="115" y1="270" x2="150" y2="270" stroke="#6c757d" stroke-width="2"/>
+  <line x1="450" y1="220" x2="420" y2="230" stroke="#6c757d" stroke-width="2"/>
+  <line x1="480" y1="310" x2="400" y2="310" stroke="#6c757d" stroke-width="2"/>
+</svg>

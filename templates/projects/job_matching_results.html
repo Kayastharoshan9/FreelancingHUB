@@ -1,0 +1,265 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Matching Freelancers | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .match-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+    
+    .match-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .match-header {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .match-score {
+        background: linear-gradient(135deg, #4a00e0, #8e2de2);
+        color: white;
+        border-radius: 30px;
+        padding: 5px 15px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .profile-card {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .profile-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 20px;
+    }
+    
+    .profile-info {
+        flex: 1;
+    }
+    
+    .profile-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .match-reason {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 20px;
+    }
+    
+    .match-reason h5 {
+        font-size: 15px;
+        margin-bottom: 10px;
+        color: #4a6cf7;
+    }
+    
+    .skills-section {
+        padding: 0 20px 20px 20px;
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 5px 12px;
+        margin: 0 8px 8px 0;
+        border-radius: 30px;
+        font-size: 13px;
+    }
+    
+    .verification-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+    
+    .rating-info {
+        display: flex;
+        margin-top: 10px;
+    }
+    
+    .rating-item {
+        margin-right: 20px;
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .job-details {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .job-details h2 {
+        margin-bottom: 15px;
+        color: #4a6cf7;
+    }
+    
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+    
+    .job-meta-item {
+        margin-right: 15px;
+        margin-bottom: 10px;
+        padding: 5px 12px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #495057;
+    }
+    
+    .section-header {
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">Matching Freelancers</h1>
+            <p class="lead text-muted">AI-powered talent matches for: <strong>{{ job.title }}</strong></p>
+        </div>
+        <a href="{% url 'job' job.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Job
+        </a>
+    </div>
+    
+    <div class="job-details">
+        <h2>Job Description</h2>
+        <p>{{ job.description }}</p>
+        
+        <div class="job-meta">
+            <div class="job-meta-item">
+                <i class="fas fa-clock me-2"></i>
+                {{ job.get_job_type_display }}
+            </div>
+            <div class="job-meta-item">
+                <i class="fas fa-dollar-sign me-2"></i>
+                ${{ job.budget_min }} - ${{ job.budget_max }}
+            </div>
+            <div class="job-meta-item">
+                <i class="fas fa-calendar me-2"></i>
+                Posted: {{ job.created|date:"M d, Y" }}
+            </div>
+        </div>
+        
+        <h5 class="mt-4 mb-2">Required Skills:</h5>
+        <div>
+            {% if job.required_skills %}
+                {% for skill in job.required_skills.split(',') %}
+                    <span class="skill-tag">{{ skill.strip }}</span>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted">No specific skills required</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="section-header">
+        <h2>{{ matches|length }} Matching Freelancers</h2>
+        <p class="text-muted">Ranked by our AI matching algorithm</p>
+    </div>
+    
+    {% if matches %}
+        {% for match in matches %}
+        <div class="match-card">
+            <div class="match-header">
+                <h3 class="h5 mb-0">Match Score</h3>
+                <span class="match-score">{{ match.score }}% Match</span>
+            </div>
+            
+            <div class="profile-card">
+                <img src="{{ match.profile.imageURL }}" alt="{{ match.profile.name }}" class="profile-image">
+                <div class="profile-info">
+                    <div class="profile-name">
+                        {{ match.profile.name }}
+                        {% if match.profile.is_verified %}
+                        <span class="verification-badge">
+                            <i class="fas fa-check-circle me-1"></i>Verified
+                        </span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted mb-2">{{ match.profile.short_intro }}</p>
+                    
+                    <div class="rating-info">
+                        <div class="rating-item">
+                            <i class="fas fa-star text-warning me-1"></i>
+                            {{ match.profile.freelancer_rating|floatformat:1 }} Rating
+                        </div>
+                        {% if match.profile.hourly_rate %}
+                        <div class="rating-item">
+                            <i class="fas fa-dollar-sign text-success me-1"></i>
+                            ${{ match.profile.hourly_rate }}/hr
+                        </div>
+                        {% endif %}
+                        <div class="rating-item">
+                            <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                            {{ match.profile.location|default:"Location not specified" }}
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'profile' match.profile.id %}" class="btn btn-primary">View Profile</a>
+            </div>
+            
+            <div class="match-reason">
+                <h5><i class="fas fa-lightbulb me-2"></i>Why This Freelancer Matches</h5>
+                <ul>
+                    {% for reason in match.reasons %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="skills-section">
+                <h5 class="mb-2">Skills & Expertise:</h5>
+                <div>
+                    {% for skill in match.profile.skill_set.all %}
+                    <span class="skill-tag">{{ skill.name }}</span>
+                    {% empty %}
+                    <p class="text-muted">No skills listed</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No matching freelancers found. Consider revising your job description with more details about required skills and project scope.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

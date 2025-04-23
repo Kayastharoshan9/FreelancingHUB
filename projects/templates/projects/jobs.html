@@ -1,0 +1,73 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="home">
+    <section class="hero-section text-center">
+        <div class="container container--narrow">
+            <div class="hero-section__box">
+                <h2>Find <span>Jobs</span> & Freelance Work</h2>
+            </div>
+
+            <div class="hero-section__search">
+                <form id="searchForm" class="form" action="{% url 'jobs' %}" method="get">
+                    <div class="form__field">
+                        <label for="formInput#search">Search Jobs </label>
+                        <input class="input input--text" id="formInput#search" type="text" name="query"
+                            value="{{query}}" placeholder="Search by job title, description, or skills" />
+                    </div>
+
+                    <input class="btn btn--main btn--lg" type="submit" value="Search" />
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="devlist">
+        <div class="container">
+            <div class="grid grid--three">
+                {% for job in jobs %}
+                <div class="column card">
+                    <div class="dev">
+                        <a href="{% url 'job' job.id %}" class="card__body">
+                            <div class="dev__profile">
+                                <div class="dev__meta">
+                                    <h3>{{job.title}}</h3>
+                                    <h5>Posted by: {{job.owner.name}}</h5>
+                                    <p>Budget: ${{job.budget_min}} - ${{job.budget_max}}</p>
+                                    <p>Deadline: {{job.deadline}}</p>
+                                    <p>Type: {{job.get_job_type_display}}</p>
+                                    {% if job.location %}
+                                    <p>Location: {{job.location}}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="dev__info">{{job.description|slice:"150"}}{% if job.description|length > 150 %}...{% endif %}</p>
+                            <div class="dev__skills">
+                                {% for skill in job.required_skills.all %}
+                                <span class="tag tag--pill tag--sub">
+                                    <small>{{skill.name}}</small>
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="column card">
+                    <div class="dev text-center">
+                        <p>No jobs found.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <div class="text-center my-md">
+        <a href="{% url 'create-job' %}" class="btn btn--sub btn--lg">Post a New Job</a>
+    </div>
+</main>
+
+{% endblock %}

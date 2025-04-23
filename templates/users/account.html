@@ -1,0 +1,226 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}My Account | FreelanceHub{% endblock %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="settingsPage profile my-md">
+    <div class="container py-4">
+        <div class="row">
+            <!-- Profile Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="position-relative mb-4">
+                            <img class="rounded-circle img-thumbnail" src="{{ profile.imageURL }}" style="width: 150px; height: 150px; object-fit: cover;" />
+                            <a class="btn btn-sm btn-primary position-absolute end-0 top-0" href="{% url 'edit-account' %}">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <h3 class="card-title mb-1">{{ profile.name }}</h3>
+                        <p class="text-muted mb-3">{{ profile.short_intro }}</p>
+                        
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="badge bg-light text-dark me-2">
+                                <i class="fas fa-map-marker-alt text-primary"></i> {{ profile.location }}
+                            </div>
+                            <div class="badge bg-light text-dark">
+                                <i class="fas fa-id-badge text-primary"></i> {{ profile.get_user_type_display }}
+                            </div>
+                        </div>
+                        
+                        {% if profile.user_type != 'client' %}
+                        <div class="mb-3">
+                            <span class="badge bg-success">
+                                <i class="fas fa-dollar-sign"></i> ${{ profile.hourly_rate|default:"Not set" }} / hour
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-center">
+                            {% if profile.social_github %}
+                            <a class="btn btn-sm btn-outline-dark mx-1" href="{{ profile.social_github }}" target="_blank">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if profile.social_twitter %}
+                            <a class="btn btn-sm btn-outline-primary mx-1" href="{{ profile.social_twitter }}" target="_blank">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if profile.social_linkedin %}
+                            <a class="btn btn-sm btn-outline-primary mx-1" href="{{ profile.social_linkedin }}" target="_blank">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if profile.social_youtube %}
+                            <a class="btn btn-sm btn-outline-danger mx-1" href="{{ profile.social_youtube }}" target="_blank">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            {% endif %}
+
+                            {% if profile.social_website %}
+                            <a class="btn btn-sm btn-outline-info mx-1" href="{{ profile.social_website }}" target="_blank">
+                                <i class="fas fa-globe"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Column -->
+            <div class="col-lg-8">
+                <!-- About Me Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">About Me</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ profile.bio }}</p>
+                    </div>
+                </div>
+                
+                <!-- Account Settings Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Account Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap">
+                            <a class="btn btn-outline-primary m-1" href="{% url 'edit-account' %}">
+                                <i class="fas fa-user-circle"></i> Edit Profile
+                            </a>
+                            <a class="btn btn-outline-primary m-1" href="{% url 'create-skill' %}">
+                                <i class="fas fa-plus-circle"></i> Add Skill
+                            </a>
+                            
+                            {% if user.profile.verification_status != 'verified' %}
+                            <a class="btn btn-outline-primary m-1" href="{% url 'submit-verification' %}">
+                                <i class="fas fa-id-card"></i> Verify Account
+                            </a>
+                            {% endif %}
+                            
+                            <a class="btn btn-outline-primary m-1" href="{% url 'inbox' %}">
+                                <i class="fas fa-envelope"></i> Messages
+                            </a>
+                            
+                            {% if user.profile.user_type != 'client' %}
+                            <a class="btn btn-outline-primary m-1" href="{% url 'payment-info' %}">
+                                <i class="fas fa-money-bill-wave"></i> Payment Information
+                            </a>
+                            {% endif %}
+                            
+                            <a class="btn btn-outline-danger m-1" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.profile.user_type != 'client' %}
+                <!-- Skills Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">My Skills</h5>
+                        <a class="btn btn-sm btn-primary" href="{% url 'create-skill' %}">
+                            <i class="fas fa-plus-circle"></i> Add Skill
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <tbody>
+                                    {% for skill in skills %}
+                                    <tr>
+                                        <td class="ps-3">
+                                            <h6 class="mb-1">{{ skill.name }}</h6>
+                                            <p class="text-muted small mb-0">{{ skill.description }}</p>
+                                        </td>
+                                        <td class="text-end pe-3">
+                                            <a class="btn btn-sm btn-outline-primary me-1" href="{% url 'update-skill' skill.id %}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <a class="btn btn-sm btn-outline-danger" href="{% url 'delete-skill' skill.id %}?next=/account">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="2" class="text-center py-3">
+                                            <p class="text-muted mb-0">You haven't added any skills yet.</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- My Projects Section -->
+                {% if user.profile.user_type != 'freelancer' %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">My Projects</h5>
+                        <a class="btn btn-sm btn-primary" href="{% url 'create-project' %}">
+                            <i class="fas fa-plus-circle"></i> Post New Project
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for project in projects %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 shadow-sm">
+                                    <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="card-img-top" style="height: 140px; object-fit: cover;">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <a href="{% url 'project' project.id %}" class="text-decoration-none">{{ project.title }}</a>
+                                        </h6>
+                                        <p class="card-text small text-muted">{{ project.description|truncatechars:80 }}</p>
+                                        <div class="d-flex flex-wrap mb-2">
+                                            {% for tag in project.tags.all|slice:":3" %}
+                                            <span class="badge bg-light text-dark me-1 mb-1">{{ tag }}</span>
+                                            {% endfor %}
+                                            {% if project.tags.count > 3 %}
+                                            <span class="badge bg-light text-dark">+{{ project.tags.count|add:"-3" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-top-0 pt-0">
+                                        <div class="d-flex">
+                                            <a class="btn btn-sm btn-outline-primary me-2" href="{% url 'update-project' project.id %}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <a class="btn btn-sm btn-outline-danger" href="{% url 'delete-project' project.id %}?next=/account">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">
+                                    <p class="mb-0">You haven't created any projects yet. 
+                                    <a href="{% url 'create-project' %}" class="alert-link">Create your first project</a></p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

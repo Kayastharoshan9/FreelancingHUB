@@ -1,0 +1,290 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-header {
+        position: relative;
+        height: 300px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .project-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.7));
+        display: flex;
+        align-items: flex-end;
+        padding: 30px;
+        color: white;
+    }
+    .owner-info {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
+    .owner-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    .project-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+    .meta-item {
+        margin-right: 25px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .meta-item i {
+        margin-right: 10px;
+        color: #6c757d;
+    }
+    .tag {
+        background-color: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    .review-form {
+        margin-top: 30px;
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .reviews {
+        margin-top: 30px;
+    }
+    .review {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .project-action-bar {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    {% if request.user.is_authenticated and request.user.profile == project.owner %}
+    <div class="project-action-bar">
+        <div>
+            <span class="badge bg-primary">Your Project</span>
+        </div>
+        <div>
+            <a href="{% url 'update-project' pk=project.id %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-edit me-2"></i>Edit Project
+            </a>
+            <a href="{% url 'delete-project' pk=project.id %}" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash-alt me-2"></i>Delete Project
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="project-header" style="background-image: url('{{ project.imageURL }}')">
+        <div class="project-overlay">
+            <div>
+                <h1>{{ project.title }}</h1>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="owner-info">
+                {% if project.owner.profile_image %}
+                    <img src="{{ project.owner.imageURL }}" alt="{{ project.owner.name }}" class="owner-avatar">
+                {% else %}
+                    <div class="owner-avatar bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <div>Created by <a href="{% url 'profile' pk=project.owner.id %}" class="text-decoration-none">{{ project.owner.name }}</a></div>
+                    <div class="text-muted small">{{ project.created|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            
+            <div class="project-meta">
+                {% if project.demo_link %}
+                <div class="meta-item">
+                    <i class="fas fa-external-link-alt"></i>
+                    <a href="{{ project.demo_link }}" target="_blank" class="text-decoration-none">Demo</a>
+                </div>
+                {% endif %}
+                
+                {% if project.source_link %}
+                <div class="meta-item">
+                    <i class="fas fa-code-branch"></i>
+                    <a href="{{ project.source_link }}" target="_blank" class="text-decoration-none">Source Code</a>
+                </div>
+                {% endif %}
+                
+                <div class="meta-item">
+                    <i class="fas fa-thumbs-up"></i>
+                    <div>
+                        <div><strong>Votes</strong></div>
+                        <div>{{ project.vote_ratio }}% Positive ({{ project.vote_total }} Votes)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Project Description</h3>
+            <div class="project-description mb-4">
+                {{ project.description|linebreaks }}
+            </div>
+            
+            <h4>Tags</h4>
+            <div class="mb-4">
+                {% for tag in project.tags.all %}
+                    <span class="tag">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+            
+            <div class="reviews">
+                <h3>Reviews ({{ project.review_set.all|length }})</h3>
+                
+                {% if request.user.is_authenticated and request.user.profile != project.owner %}
+                    {% if request.user.profile.id in project.reviewers %}
+                        <div class="alert alert-info">
+                            You have already submitted a review for this project.
+                        </div>
+                    {% else %}
+                        <div class="review-form">
+                            <h5>Add Your Review</h5>
+                            <form action="{% url 'project' project.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="{{ form.value.id_for_label }}" class="form-label">{{ form.value.label }}</label>
+                                    {{ form.value }}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.body.id_for_label }}" class="form-label">{{ form.body.label }}</label>
+                                    {{ form.body }}
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                
+                {% if project.review_set.all %}
+                    {% for review in project.review_set.all %}
+                    <div class="review">
+                        <div class="review-header">
+                            <div class="d-flex align-items-center">
+                                {% if review.owner.profile_image %}
+                                    <img src="{{ review.owner.imageURL }}" alt="{{ review.owner.name }}" width="30" height="30" class="rounded-circle me-2">
+                                {% else %}
+                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                        <i class="fas fa-user text-white small"></i>
+                                    </div>
+                                {% endif %}
+                                <span>{{ review.owner.name }}</span>
+                            </div>
+                            <div>
+                                {% if review.value == 'up' %}
+                                    <span class="badge bg-success"><i class="fas fa-thumbs-up me-1"></i>Up Vote</span>
+                                {% else %}
+                                    <span class="badge bg-danger"><i class="fas fa-thumbs-down me-1"></i>Down Vote</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p>{{ review.body }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-secondary">
+                        No reviews yet. Be the first to review this project!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">About the Creator</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        {% if project.owner.profile_image %}
+                            <img src="{{ project.owner.imageURL }}" alt="{{ project.owner.name }}" width="60" height="60" class="rounded-circle me-3">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h5 class="mb-0">{{ project.owner.name }}</h5>
+                            <p class="mb-0 text-muted">{{ project.owner.short_intro }}</p>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'profile' pk=project.owner.id %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-user me-2"></i>View Profile
+                    </a>
+                    
+                    {% if request.user.is_authenticated and request.user.profile != project.owner %}
+                        <a href="{% url 'create-message' pk=project.owner.id %}" class="btn btn-primary btn-sm w-100 mt-2">
+                            <i class="fas fa-envelope me-2"></i>Send Message
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">More Projects</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for related_project in project.owner.project_set.all|slice:":3" %}
+                            {% if related_project.id != project.id %}
+                                <a href="{% url 'project' pk=related_project.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">{{ related_project.title }}</h6>
+                                        <small>{{ related_project.vote_ratio }}%</small>
+                                    </div>
+                                    <p class="mb-1 text-truncate">{{ related_project.description }}</p>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

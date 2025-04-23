@@ -1,0 +1,50 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <a class="backButton" href="{{ request.META.HTTP_REFERER }}"><iconify-icon icon="material-symbols:chevron-left" width="24"></iconify-icon></a>
+            <br>
+
+            <h3>Release Payment</h3>
+            
+            <div class="form__field">
+                <h4>Job: {{payment.milestone.job.title}}</h4>
+                <h4>Milestone: {{payment.milestone.title}}</h4>
+                <h4>Amount: ${{payment.amount}}</h4>
+                <h4>Freelancer: {{payment.milestone.job.freelancer.name}}</h4>
+            </div>
+            
+            <div class="form__field">
+                <p>Are you satisfied with the work done for this milestone? Releasing the payment will transfer the funds to the freelancer.</p>
+            </div>
+            
+            <form id="release-form" method="POST" action="{% url 'release-payment' payment.id %}">
+                {% csrf_token %}
+                
+                <button id="submit-button" class="btn btn--sub btn--lg my-md" type="submit">
+                    Release Payment
+                </button>
+                
+                <a href="{% url 'job-detail' payment.milestone.job.id %}" class="btn btn--sub btn--lg my-md">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    // Disable the submit button to prevent multiple submissions
+    document.getElementById("release-form").addEventListener("submit", function(event) {
+        document.getElementById("submit-button").disabled = true;
+    });
+</script>
+{% endblock %}

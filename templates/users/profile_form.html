@@ -1,0 +1,214 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Edit Profile | FreelanceHub{% endblock %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex align-items-center">
+                            <a class="btn btn-sm btn-outline-primary me-3" href="{% url 'account' %}">
+                                <i class="fas fa-angle-left"></i> Back
+                            </a>
+                            <h3 class="mb-0">Edit Your Profile</h3>
+                        </div>
+                        <p class="text-muted mt-2 mb-0">Update your profile information and preferences</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form class="form" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <!-- Profile Image Section -->
+                            <div class="row mb-4">
+                                <div class="col-12 text-center mb-3">
+                                    <div class="position-relative d-inline-block">
+                                        <img 
+                                            src="{{ form.instance.imageURL }}" 
+                                            alt="{{ form.instance.name }}" 
+                                            class="rounded-circle img-thumbnail"
+                                            style="width:150px; height:150px; object-fit:cover;"
+                                            id="profile-image-preview"
+                                        >
+                                        <label for="{{ form.profile_image.id_for_label }}" class="btn btn-sm btn-primary position-absolute bottom-0 end-0">
+                                            <i class="fas fa-camera"></i>
+                                        </label>
+                                        <div class="d-none">
+                                            {{ form.profile_image }}
+                                        </div>
+                                    </div>
+                                    {% if form.profile_image.help_text %}
+                                        <p class="form-text mt-2">{{ form.profile_image.help_text }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Account Type Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Account Type</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="{{ form.user_type.id_for_label }}" class="form-label">{{ form.user_type.label }}</label>
+                                        {{ form.user_type }}
+                                        {% if form.user_type.help_text %}
+                                            <div class="form-text">{{ form.user_type.help_text }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Freelancer-specific fields -->
+                                    <div id="freelancer-specific-fields" class="{% if form.instance.user_type == 'client' %}d-none{% endif %}">
+                                        <div class="mb-3">
+                                            <label for="{{ form.hourly_rate.id_for_label }}" class="form-label">{{ form.hourly_rate.label }}</label>
+                                            {{ form.hourly_rate }}
+                                            <div class="form-text">Your default hourly rate for projects</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Basic Information -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Basic Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="{{ form.name.id_for_label }}" class="form-label">Full Name</label>
+                                        {{ form.name }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                                        {{ form.email }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                        {{ form.username }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                                        {{ form.location }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bio Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Profile & Bio</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="{{ form.short_intro.id_for_label }}" class="form-label">{{ form.short_intro.label }}</label>
+                                        {{ form.short_intro }}
+                                        <div class="form-text">This will appear in profile cards and search results</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.bio.id_for_label }}" class="form-label">Full Bio</label>
+                                        {{ form.bio }}
+                                        <div class="form-text">Describe your experience, skills, and qualifications in detail</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social Media Section -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">Social Links</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="{{ form.social_github.id_for_label }}" class="form-label">
+                                            <i class="fab fa-github"></i> {{ form.social_github.label }}
+                                        </label>
+                                        {{ form.social_github }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.social_twitter.id_for_label }}" class="form-label">
+                                            <i class="fab fa-twitter"></i> {{ form.social_twitter.label }}
+                                        </label>
+                                        {{ form.social_twitter }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.social_linkedin.id_for_label }}" class="form-label">
+                                            <i class="fab fa-linkedin"></i> {{ form.social_linkedin.label }}
+                                        </label>
+                                        {{ form.social_linkedin }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.social_youtube.id_for_label }}" class="form-label">
+                                            <i class="fab fa-youtube"></i> {{ form.social_youtube.label }}
+                                        </label>
+                                        {{ form.social_youtube }}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.social_website.id_for_label }}" class="form-label">
+                                            <i class="fas fa-globe"></i> {{ form.social_website.label }}
+                                        </label>
+                                        {{ form.social_website }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-primary btn-lg" type="submit">
+                                    <i class="fas fa-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Preview uploaded image
+    document.addEventListener('DOMContentLoaded', function() {
+        const profileImageInput = document.getElementById('{{ form.profile_image.id_for_label }}');
+        const previewImage = document.getElementById('profile-image-preview');
+        
+        if (profileImageInput && previewImage) {
+            profileImageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Toggle freelancer-specific fields based on account type
+        const userTypeSelect = document.getElementById('{{ form.user_type.id_for_label }}');
+        const freelancerFields = document.getElementById('freelancer-specific-fields');
+        
+        if (userTypeSelect && freelancerFields) {
+            userTypeSelect.addEventListener('change', function() {
+                if (this.value === 'client') {
+                    freelancerFields.classList.add('d-none');
+                } else {
+                    freelancerFields.classList.remove('d-none');
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock content %}

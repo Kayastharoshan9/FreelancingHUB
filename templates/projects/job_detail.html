@@ -1,0 +1,523 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}{{ job.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .job-header {
+        padding: 30px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .client-info {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+    }
+    .client-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+    .meta-item {
+        margin-right: 25px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .meta-item i {
+        margin-right: 10px;
+        color: #6c757d;
+    }
+    .skill-tag {
+        background-color: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    .section-divider {
+        margin: 40px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .bid-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    .bid-card:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .bid-header {
+        padding: 15px 20px;
+        background-color: #f8f9fa;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .bid-body {
+        padding: 20px;
+    }
+    .milestone-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+    .milestone-header {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .milestone-body {
+        padding: 15px;
+    }
+    .milestone-footer {
+        padding: 15px;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    .status-funded {
+        background-color: #e9f7ef;
+        color: #27ae60;
+    }
+    .status-completed {
+        background-color: #eafaf1;
+        color: #2ecc71;
+    }
+    .status-pending {
+        background-color: #f8f9fa;
+        color: #95a5a6;
+    }
+    .job-action-bar {
+        margin-bottom: 30px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .job-action-bar .badge {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    .review-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        padding: 20px;
+    }
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .rating {
+        color: #f1c40f;
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="job-action-bar">
+        <div>
+            {% if job.is_completed %}
+                <span class="badge bg-success">Completed</span>
+            {% elif not job.is_active %}
+                <span class="badge bg-danger">Inactive</span>
+            {% elif job.freelancer %}
+                <span class="badge bg-info">In Progress</span>
+            {% else %}
+                <span class="badge bg-primary">Open for Bids</span>
+            {% endif %}
+        </div>
+        
+        <div>
+            {% if request.user.is_authenticated %}
+                {% if request.user.profile == job.client %}
+                    <a href="{% url 'update-job' pk=job.id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-edit me-2"></i>Edit Job
+                    </a>
+                    <a href="{% url 'delete-job' pk=job.id %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash-alt me-2"></i>Delete Job
+                    </a>
+                {% endif %}
+                
+                {% if request.user.profile != job.client and not job.freelancer and not user_bid %}
+                    <a href="{% url 'create-bid' job_id=job.id %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-hand-paper me-2"></i>Submit a Proposal
+                    </a>
+                {% endif %}
+                
+                {% if user_bid %}
+                    <a href="{% url 'update-bid' pk=user_bid.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-2"></i>Edit Proposal
+                    </a>
+                    <a href="{% url 'delete-bid' pk=user_bid.id %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash-alt me-2"></i>Withdraw Proposal
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="job-header">
+        <h1>{{ job.title }}</h1>
+        
+        <div class="client-info">
+            {% if job.client.profile_image %}
+                <img src="{{ job.client.profile_image.url }}" alt="{{ job.client.name }}" class="client-avatar">
+            {% else %}
+                <div class="client-avatar bg-secondary d-flex align-items-center justify-content-center">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+            {% endif %}
+            <div>
+                <div>Posted by <strong>{{ job.client.name }}</strong></div>
+                <div class="text-muted small">{{ job.created|date:"M d, Y" }}</div>
+            </div>
+        </div>
+        
+        <div class="job-meta">
+            <div class="meta-item">
+                <i class="fas fa-money-bill-wave"></i>
+                <div>
+                    <div><strong>Budget</strong></div>
+                    <div>${{ job.budget_min }} - ${{ job.budget_max }}{% if job.job_type == 'hourly' %}/hr{% endif %}</div>
+                </div>
+            </div>
+            
+            <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <div><strong>Job Type</strong></div>
+                    <div>{% if job.job_type == 'fixed' %}Fixed Price{% else %}Hourly Rate{% endif %}</div>
+                </div>
+            </div>
+            
+            {% if job.deadline %}
+            <div class="meta-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div>
+                    <div><strong>Deadline</strong></div>
+                    <div>{{ job.deadline|date:"M d, Y" }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if job.location %}
+            <div class="meta-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <div><strong>Location</strong></div>
+                    <div>{{ job.location }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <h5>Required Skills</h5>
+            {% for skill in job.required_skills.all %}
+                <span class="skill-tag">{{ skill.name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <h3>Job Description</h3>
+            <div class="job-description mb-4">
+                {{ job.description|linebreaks }}
+            </div>
+            
+            {% if job.freelancer %}
+                <div class="section-divider"></div>
+                
+                <h3>Assigned Freelancer</h3>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            {% if job.freelancer.profile_image %}
+                                <img src="{{ job.freelancer.profile_image.url }}" alt="{{ job.freelancer.name }}" class="client-avatar me-3">
+                            {% else %}
+                                <div class="client-avatar bg-primary d-flex align-items-center justify-content-center me-3">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-0">{{ job.freelancer.name }}</h5>
+                                <div class="text-muted">{{ job.freelancer.short_intro }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-divider"></div>
+                
+                <h3>Milestones</h3>
+                
+                {% if request.user.is_authenticated and request.user.profile == job.client or request.user.profile == job.freelancer %}
+                    <div class="mb-3">
+                        <a href="{% url 'create-milestone' job_id=job.id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus-circle me-2"></i>Add Milestone
+                        </a>
+                    </div>
+                {% endif %}
+                
+                {% if milestones %}
+                    {% for milestone in milestones %}
+                        <div class="milestone-card">
+                            <div class="milestone-header">
+                                <h5 class="mb-0">{{ milestone.title }}</h5>
+                                <div>
+                                    {% if milestone.is_completed %}
+                                        <span class="status-badge status-completed">Completed</span>
+                                    {% elif milestone.is_funded %}
+                                        <span class="status-badge status-funded">Funded</span>
+                                    {% else %}
+                                        <span class="status-badge status-pending">Pending</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="milestone-body">
+                                <p>{{ milestone.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Amount:</strong> ${{ milestone.amount }}
+                                    </div>
+                                    {% if milestone.due_date %}
+                                        <div>
+                                            <strong>Due Date:</strong> {{ milestone.due_date|date:"M d, Y" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="milestone-footer">
+                                <div>
+                                    {% if not milestone.is_funded and not milestone.is_completed %}
+                                        {% if request.user.is_authenticated and request.user.profile == job.client or request.user.profile == job.freelancer %}
+                                            <a href="{% url 'update-milestone' pk=milestone.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                            <a href="{% url 'delete-milestone' pk=milestone.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if not milestone.is_funded and request.user.is_authenticated and request.user.profile == job.client %}
+                                        <a href="{% url 'payment-page' milestone_id=milestone.id %}" class="btn btn-success btn-sm">
+                                            <i class="fas fa-credit-card me-1"></i>Fund Milestone
+                                        </a>
+                                    {% elif milestone.is_funded and not milestone.is_completed and request.user.is_authenticated and request.user.profile == job.freelancer %}
+                                        <a href="{% url 'complete-milestone' pk=milestone.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-check me-1"></i>Mark as Completed
+                                        </a>
+                                    {% elif milestone.is_funded and milestone.is_completed and request.user.is_authenticated and request.user.profile == job.client %}
+                                        {% for payment in milestone.payments.all %}
+                                            {% if payment.status == 'escrow' %}
+                                                <a href="{% url 'review-and-release' job_id=job.id milestone_id=milestone.id %}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-star me-1"></i><i class="fas fa-paper-plane me-1"></i>Review & Release
+                                                </a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <p class="mb-0">No milestones have been created for this job yet.</p>
+                    </div>
+                {% endif %}
+                
+                {% if job.is_completed %}
+                    <div class="section-divider"></div>
+                    
+                    <h3>Reviews</h3>
+                    
+                    {% if request.user.is_authenticated %}
+                        {% if request.user.profile == job.client and not job.client_review %}
+                            <div class="mb-3">
+                                <a href="{% url 'create-client-review' job_id=job.id %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-star me-2"></i>Leave a Review for {{ job.freelancer.name }}
+                                </a>
+                            </div>
+                        {% endif %}
+                        
+                        {% if request.user.profile == job.freelancer and not job.freelancer_review %}
+                            <div class="mb-3">
+                                <a href="{% url 'create-freelancer-review' job_id=job.id %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-star me-2"></i>Leave a Review for {{ job.client.name }}
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if job.client_review or job.freelancer_review %}
+                        {% if job.client_review %}
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <h5>{{ job.client.name }}'s Review</h5>
+                                    <div class="rating">
+                                        {% for i in '12345'|make_list %}
+                                            {% if forloop.counter <= job.client_review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p>{{ job.client_review.comment }}</p>
+                                <div class="text-muted small">{{ job.client_review.created|date:"M d, Y" }}</div>
+                            </div>
+                        {% endif %}
+                        
+                        {% if job.freelancer_review %}
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <h5>{{ job.freelancer.name }}'s Review</h5>
+                                    <div class="rating">
+                                        {% for i in '12345'|make_list %}
+                                            {% if forloop.counter <= job.freelancer_review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <p>{{ job.freelancer_review.comment }}</p>
+                                <div class="text-muted small">{{ job.freelancer_review.created|date:"M d, Y" }}</div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">No reviews have been submitted for this job yet.</p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            {% if not job.freelancer %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Proposals ({{ job.bids.count }})</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if job.bids.all %}
+                            {% if request.user.profile == job.client %}
+                                {% for bid in job.bids.all %}
+                                    <div class="bid-card mb-3">
+                                        <div class="bid-header">
+                                            <h6 class="mb-0">{{ bid.freelancer.name }}</h6>
+                                            <span class="badge bg-primary">${{ bid.amount }}{% if job.job_type == 'hourly' %}/hr{% endif %}</span>
+                                        </div>
+                                        <div class="bid-body">
+                                            <p class="mb-2">{{ bid.proposal|truncatewords:30 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-clock me-1"></i>Delivery: {{ bid.delivery_time }} days
+                                                </span>
+                                                <a href="{% url 'accept-bid' pk=bid.id %}" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check me-1"></i>Accept
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">{{ job.bids.count }} proposals have been submitted.</p>
+                                
+                                {% if user_bid %}
+                                    <div class="alert alert-info">
+                                        <h6>Your Proposal</h6>
+                                        <div>
+                                            <strong>Bid Amount:</strong> ${{ user_bid.amount }}{% if job.job_type == 'hourly' %}/hr{% endif %}
+                                        </div>
+                                        <div>
+                                            <strong>Delivery Time:</strong> {{ user_bid.delivery_time }} days
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                <p>No proposals yet. Be the first to bid on this job!</p>
+                                
+                                {% if request.user.is_authenticated and request.user.profile != job.client %}
+                                    <a href="{% url 'create-bid' job_id=job.id %}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-paper-plane me-2"></i>Submit a Proposal
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Similar Jobs</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Based on required skills and job type</p>
+                    
+                    <div class="list-group">
+                        {% for skill in job.required_skills.all %}
+                            {% if forloop.first %}
+                                {% for similar_job in skill.job_skills.all|slice:":3" %}
+                                    {% if similar_job.id != job.id and similar_job.is_active %}
+                                        <a href="{% url 'job' pk=similar_job.id %}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex justify-content-between">
+                                                <h6 class="mb-1">{{ similar_job.title }}</h6>
+                                                <small>${{ similar_job.budget_min }} - ${{ similar_job.budget_max }}</small>
+                                            </div>
+                                            <p class="mb-1 text-truncate">{{ similar_job.description }}</p>
+                                            <small class="text-muted">Posted {{ similar_job.created|date:"M d, Y" }}</small>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Payment Error{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    .error-icon {
+        font-size: 5rem;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    .error-details {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container text-center">
+    <div class="error-icon">
+        <i class="fas fa-exclamation-circle"></i>
+    </div>
+    
+    <h1 class="mb-3">Payment Error</h1>
+    <div class="alert alert-danger">
+        <p class="mb-0">There was a problem processing your payment.</p>
+    </div>
+    
+    {% if error %}
+    <div class="error-details">
+        <h5 class="mb-3">Error Details:</h5>
+        <code>{{ error }}</code>
+    </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{% url 'jobs' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-arrow-left me-2"></i>Return to Jobs
+        </a>
+    </div>
+</div>
+{% endblock %}

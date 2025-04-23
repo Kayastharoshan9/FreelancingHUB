@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="formPage my-xl">
+    <div class="content-box">
+        <div class="formWrapper">
+            <a class="backButton" href="{{ request.META.HTTP_REFERER }}"><iconify-icon icon="material-symbols:chevron-left" width="24"></iconify-icon></a>
+            <br>
+
+            <h3>Complete Milestone</h3>
+            
+            <div class="form__field">
+                <h4>Job: {{job.title}}</h4>
+                <h4>Milestone: {{milestone.title}}</h4>
+                <h4>Amount: ${{milestone.amount}}</h4>
+            </div>
+            
+            <div class="form__field">
+                <p>Are you sure you want to mark this milestone as complete? This will release the payment to the freelancer.</p>
+            </div>
+            
+            <form method="POST" action="">
+                {% csrf_token %}
+                <button class="btn btn--sub btn--lg my-md" type="submit">
+                    Confirm Completion
+                </button>
+                
+                <a href="{% url 'job-detail' job.id %}" class="btn btn--sub btn--lg my-md">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

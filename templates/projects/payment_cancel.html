@@ -1,0 +1,34 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="payment-cancel container">
+    <div class="card">
+        <div class="card-body text-center">
+            <i class="fas fa-times-circle text-danger fa-5x mb-4"></i>
+            <h1 class="card-title">Payment Cancelled</h1>
+            <p class="card-text">Your payment for the milestone "{{ milestone.title }}" was cancelled. No charges have been made to your account.</p>
+            
+            <div class="payment-details mt-4">
+                <h4>Milestone Details</h4>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Milestone:</div>
+                    <div class="col-md-6 text-md-left">{{ milestone.title }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Amount:</div>
+                    <div class="col-md-6 text-md-left">${{ milestone.amount }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Job:</div>
+                    <div class="col-md-6 text-md-left">{{ milestone.job.title }}</div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <a href="{% url 'job-detail' milestone.job.id %}" class="btn btn-primary">Return to Job</a>
+                <a href="{% url 'create-checkout-session' milestone.id %}" class="btn btn-success ml-3">Try Again</a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

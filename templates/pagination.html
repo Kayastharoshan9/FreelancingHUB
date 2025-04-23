@@ -1,0 +1,82 @@
+{% if queryset.has_other_pages %}
+<div class="pagination-wrapper">
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if queryset.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ queryset.previous_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.min_rate %}&min_rate={{ request.GET.min_rate }}{% endif %}{% if request.GET.max_rate %}&max_rate={{ request.GET.max_rate }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{{ skills_params }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+
+            {% for num in custom_range %}
+                {% if queryset.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.min_rate %}&min_rate={{ request.GET.min_rate }}{% endif %}{% if request.GET.max_rate %}&max_rate={{ request.GET.max_rate }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{{ skills_params }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if queryset.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ queryset.next_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}{% if request.GET.min_rate %}&min_rate={{ request.GET.min_rate }}{% endif %}{% if request.GET.max_rate %}&max_rate={{ request.GET.max_rate }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}{% if request.GET.location %}&location={{ request.GET.location }}{% endif %}{{ skills_params }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .pagination-wrapper {
+        margin-top: 2rem;
+    }
+    
+    .pagination {
+        margin-bottom: 0;
+    }
+    
+    .page-item {
+        margin: 0 2px;
+    }
+    
+    .page-link {
+        border: none;
+        padding: 8px 16px;
+        color: #4a6cf7;
+        background: #f8f9fa;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+        background: #e9ecef;
+        color: #4a6cf7;
+        transform: translateY(-2px);
+    }
+    
+    .page-item.active .page-link {
+        background: #4a6cf7;
+        color: white;
+    }
+    
+    .page-item.disabled .page-link {
+        background: #f8f9fa;
+        color: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    @media (max-width: 576px) {
+        .page-link {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endif %} 

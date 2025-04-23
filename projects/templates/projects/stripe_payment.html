@@ -1,0 +1,44 @@
+{% extends "main.html" %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Payment for Milestone</h2>
+            <form id="payment-form" method="post" action="{% url "create-checkout-session" milestone_id=milestone.id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <h4>Milestone Details</h4>
+                    <p><strong>Title:</strong> {{ milestone.title }}</p>
+                    <p><strong>Description:</strong> {{ milestone.description }}</p>
+                    <p><strong>Amount:</strong> ${{ milestone.amount|floatformat:2 }}</p>
+                </div>
+                <div class="alert alert-info">
+                    <h5>Payment Information</h5>
+                    <p>Once you proceed, you will be redirected to Stripe to complete your payment securely.</p>
+                    <p>Your payment will be held in escrow until you confirm that the milestone has been completed to your satisfaction.</p>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" id="submit-button" class="btn btn-primary">Proceed to Payment</button>
+                    <a href="{% url "project" milestone.project.id %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const form = document.getElementById("payment-form");
+      if (form) {
+          form.addEventListener("submit", function() {
+              const button = document.getElementById("submit-button");
+              button.disabled = true;
+              button.textContent = "Processing...";
+          });
+      }
+  });
+</script>
+{% endblock javascript %}

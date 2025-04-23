@@ -1,0 +1,258 @@
+{% extends 'main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Payment Information | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-page {
+        padding: 60px 0;
+        background-color: #f8f9fa;
+    }
+    
+    .payment-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .payment-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .payment-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .payment-subtitle {
+        color: #6c757d;
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .payment-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .payment-section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .payment-section-title i {
+        margin-right: 10px;
+        color: #4a6cf7;
+        font-size: 22px;
+    }
+    
+    .payment-info-box {
+        background-color: #e3f2fd;
+        border-left: 4px solid #4a6cf7;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .payment-info-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .payment-info-text {
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    .warning-box {
+        background-color: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 5px;
+        padding: 15px;
+        margin: 25px 0;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 10px 15px;
+        font-size: 15px;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25);
+    }
+    
+    .error-text {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    
+    .submit-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: #4a6cf7;
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        background-color: #3a5bd9;
+        transform: translateY(-2px);
+    }
+    
+    .cancel-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: transparent;
+        color: #6c757d;
+        border: 1px solid #6c757d;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        margin-right: 15px;
+    }
+    
+    .cancel-btn:hover {
+        color: #4a6cf7;
+        border-color: #4a6cf7;
+    }
+    
+    .payments-illustration {
+        max-width: 250px;
+        margin: 0 auto 30px;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="payment-page">
+    <div class="container payment-container">
+        <div class="payment-header">
+            <img src="https://cdn.pixabay.com/photo/2016/10/16/16/33/dual-screen-1745705_960_720.png" alt="Secure Payments" class="payments-illustration">
+            <h1 class="payment-title">Payment Information</h1>
+            <p class="payment-subtitle">Add your payment details to receive payments for completed projects or make payments as a client.</p>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Bank Account Section -->
+            <div class="payment-card">
+                <h3 class="payment-section-title">
+                    <i class="fas fa-university"></i>
+                    Bank Account Information
+                </h3>
+                
+                <div class="payment-info-box">
+                    <h5 class="payment-info-title">Why provide bank details?</h5>
+                    <p class="payment-info-text">Your bank account details are used for direct transfers and payouts. All information is encrypted and secure.</p>
+                </div>
+                
+                <div class="row">
+                    {% for field in form %}
+                        {% if 'bank' in field.name %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field|add_class:"form-control" }}
+                                {% for error in field.errors %}
+                                <p class="error-text">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Digital Payment Section -->
+            <div class="payment-card">
+                <h3 class="payment-section-title">
+                    <i class="fas fa-wallet"></i>
+                    Alternative Payment Methods
+                </h3>
+                
+                <div class="payment-info-box">
+                    <h5 class="payment-info-title">Digital payment options</h5>
+                    <p class="payment-info-text">You can also add digital payment options like PayPal or cryptocurrency wallets for faster transactions.</p>
+                </div>
+                
+                <div class="row">
+                    {% for field in form %}
+                        {% if 'bank' not in field.name %}
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field|add_class:"form-control" }}
+                                {% for error in field.errors %}
+                                <p class="error-text">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Security Notice -->
+            <div class="warning-box">
+                <p class="mb-0"><strong><i class="fas fa-shield-alt me-2"></i> Security Notice:</strong> All payment information is stored securely using industry-standard encryption. You can update this information at any time.</p>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'account' %}" class="cancel-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-save me-2"></i>Save Payment Information
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

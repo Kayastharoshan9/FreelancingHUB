@@ -1,0 +1,123 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Leave a Review{% endblock %}
+
+{% block extra_css %}
+<style>
+    .job-summary {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .job-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .review-tips {
+        background-color: #e9f7ef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .tip-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+    .tip-icon {
+        margin-right: 10px;
+        color: #27ae60;
+    }
+    .rating-container {
+        margin-bottom: 20px;
+    }
+    .rating-stars {
+        font-size: 1.5rem;
+        color: #f1c40f;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-container">
+        <h1 class="mb-4">
+            {% if review_type == 'client' %}
+                Review {{ job.freelancer.name }}
+            {% else %}
+                Review {{ job.client.name }}
+            {% endif %}
+        </h1>
+        
+        <div class="job-summary">
+            <div class="job-title">{{ job.title }}</div>
+            <p class="mb-0">Completed on: {{ job.updated|date:"F d, Y" }}</p>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="rating-container">
+                <label for="{{ form.rating.id_for_label }}" class="form-label">Rating</label>
+                {{ form.rating }}
+                {% if form.rating.errors %}
+                    <div class="text-danger small">{{ form.rating.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-4">
+                <label for="{{ form.comment.id_for_label }}" class="form-label">
+                    {% if review_type == 'client' %}
+                        Share your experience working with {{ job.freelancer.name }}
+                    {% else %}
+                        Share your experience working with {{ job.client.name }}
+                    {% endif %}
+                </label>
+                {{ form.comment }}
+                {% if form.comment.errors %}
+                    <div class="text-danger small">{{ form.comment.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-star me-2"></i>Submit Review
+                </button>
+            </div>
+        </form>
+        
+        <div class="review-tips">
+            <h5><i class="fas fa-lightbulb me-2"></i>Tips for Helpful Reviews</h5>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Be honest and fair in your assessment.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Provide specific details about what went well or could have been improved.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Focus on the professional relationship and quality of work.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Consider communication, timeliness, and overall satisfaction.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Keep personal feelings separate from professional assessment.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="release-payment container">
+    <div class="card">
+        <div class="card-body text-center">
+            <i class="fas fa-money-bill-wave text-primary fa-5x mb-4"></i>
+            <h1 class="card-title">Release Payment</h1>
+            <p class="card-text">You are about to release the milestone payment to the freelancer. This action cannot be undone.</p>
+            
+            <div class="release-details mt-4">
+                <h4>Payment Details</h4>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Milestone:</div>
+                    <div class="col-md-6 text-md-left">{{ milestone.title }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Amount:</div>
+                    <div class="col-md-6 text-md-left">${{ milestone.amount }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Job:</div>
+                    <div class="col-md-6 text-md-left">{{ milestone.job.title }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 text-md-right">Freelancer:</div>
+                    <div class="col-md-6 text-md-left">{{ milestone.job.freelancer.name }}</div>
+                </div>
+            </div>
+            
+            <div class="mt-5">
+                <form method="post" action="{% url 'release-payment' milestone.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success">Confirm Release</button>
+                    <a href="{% url 'job-detail' milestone.job.id %}" class="btn btn-outline-secondary ml-3">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

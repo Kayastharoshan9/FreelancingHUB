@@ -1,0 +1,368 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Rate {{ profile.name }} | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rating-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .rating-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .rating-header h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .rating-header p {
+        color: #6c757d;
+        font-size: 18px;
+    }
+    
+    .rating-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .profile-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-right: 20px;
+        object-fit: cover;
+    }
+    
+    .profile-details h3 {
+        margin-bottom: 5px;
+        font-size: 20px;
+    }
+    
+    .profile-title {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+    
+    .star-rating input {
+        display: none;
+    }
+    
+    .star-rating label {
+        cursor: pointer;
+        font-size: 30px;
+        color: #ddd;
+        padding: 0 5px;
+    }
+    
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+        color: #ffc107;
+    }
+    
+    .rating-label {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .rating-factors {
+        margin-bottom: 30px;
+    }
+    
+    .rating-factor {
+        margin-bottom: 20px;
+    }
+    
+    .rating-factor label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    
+    .factor-rating {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .factor-rating label {
+        flex: 1;
+        text-align: center;
+        padding: 10px 5px;
+        border: 1px solid #dee2e6;
+        margin: 0 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .factor-rating input {
+        display: none;
+    }
+    
+    .factor-rating input:checked + label {
+        background: var(--color-main);
+        color: white;
+        border-color: var(--color-main);
+    }
+    
+    .project-info {
+        background: #f8f9fa;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .project-info h4 {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    
+    .project-info p {
+        color: #6c757d;
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+    
+    .comment-field textarea {
+        resize: vertical;
+        min-height: 150px;
+    }
+    
+    .rating-actions {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .rating-actions .btn {
+        padding: 10px 30px;
+    }
+    
+    @media (max-width: 767px) {
+        .factor-rating {
+            flex-wrap: wrap;
+        }
+        
+        .factor-rating label {
+            flex: 0 0 48%;
+            margin: 5px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="rating-page">
+    <div class="container">
+        <div class="rating-container">
+            <div class="rating-header">
+                <h1>Rate Your Experience</h1>
+                <p>Your feedback helps the community and improves our platform.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="rating-card">
+                    <div class="profile-info">
+                        <img src="{{ profile.imageURL }}" alt="{{ profile.name }}" class="profile-avatar">
+                        <div class="profile-details">
+                            <h3>{{ profile.name }}</h3>
+                            <p class="profile-title">{{ profile.short_intro }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if is_client_rating %}
+                    <!-- Client rating a freelancer -->
+                    <div class="project-info">
+                        <h4>Project: {{ project.title }}</h4>
+                        <p>Completed on: {{ project.completion_date|date:"F d, Y" }}</p>
+                    </div>
+                    
+                    <p class="mb-4">Please rate your experience working with {{ profile.name }} on this project.</p>
+                    
+                    <div class="mb-4">
+                        <h5 class="rating-label">Overall Rating</h5>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" {% if form.rating.value == 5 %}checked{% endif %}>
+                            <label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" {% if form.rating.value == 4 %}checked{% endif %}>
+                            <label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" {% if form.rating.value == 3 %}checked{% endif %}>
+                            <label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" {% if form.rating.value == 2 %}checked{% endif %}>
+                            <label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" {% if form.rating.value == 1 %}checked{% endif %}>
+                            <label for="star1" title="1 star">★</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-factors">
+                        <h5 class="rating-label">Rate Specific Factors</h5>
+                        
+                        <div class="rating-factor">
+                            <label>Quality of Work</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="quality1" name="quality" value="1" {% if form.quality.value == 1 %}checked{% endif %}>
+                                <label for="quality1">Poor</label>
+                                <input type="radio" id="quality2" name="quality" value="2" {% if form.quality.value == 2 %}checked{% endif %}>
+                                <label for="quality2">Fair</label>
+                                <input type="radio" id="quality3" name="quality" value="3" {% if form.quality.value == 3 %}checked{% endif %}>
+                                <label for="quality3">Good</label>
+                                <input type="radio" id="quality4" name="quality" value="4" {% if form.quality.value == 4 %}checked{% endif %}>
+                                <label for="quality4">Very Good</label>
+                                <input type="radio" id="quality5" name="quality" value="5" {% if form.quality.value == 5 %}checked{% endif %}>
+                                <label for="quality5">Excellent</label>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-factor">
+                            <label>Communication</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="communication1" name="communication" value="1" {% if form.communication.value == 1 %}checked{% endif %}>
+                                <label for="communication1">Poor</label>
+                                <input type="radio" id="communication2" name="communication" value="2" {% if form.communication.value == 2 %}checked{% endif %}>
+                                <label for="communication2">Fair</label>
+                                <input type="radio" id="communication3" name="communication" value="3" {% if form.communication.value == 3 %}checked{% endif %}>
+                                <label for="communication3">Good</label>
+                                <input type="radio" id="communication4" name="communication" value="4" {% if form.communication.value == 4 %}checked{% endif %}>
+                                <label for="communication4">Very Good</label>
+                                <input type="radio" id="communication5" name="communication" value="5" {% if form.communication.value == 5 %}checked{% endif %}>
+                                <label for="communication5">Excellent</label>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-factor">
+                            <label>Meeting Deadlines</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="deadlines1" name="deadlines" value="1" {% if form.deadlines.value == 1 %}checked{% endif %}>
+                                <label for="deadlines1">Poor</label>
+                                <input type="radio" id="deadlines2" name="deadlines" value="2" {% if form.deadlines.value == 2 %}checked{% endif %}>
+                                <label for="deadlines2">Fair</label>
+                                <input type="radio" id="deadlines3" name="deadlines" value="3" {% if form.deadlines.value == 3 %}checked{% endif %}>
+                                <label for="deadlines3">Good</label>
+                                <input type="radio" id="deadlines4" name="deadlines" value="4" {% if form.deadlines.value == 4 %}checked{% endif %}>
+                                <label for="deadlines4">Very Good</label>
+                                <input type="radio" id="deadlines5" name="deadlines" value="5" {% if form.deadlines.value == 5 %}checked{% endif %}>
+                                <label for="deadlines5">Excellent</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <!-- Freelancer rating a client -->
+                    <div class="project-info">
+                        <h4>Project: {{ project.title }}</h4>
+                        <p>Completed on: {{ project.completion_date|date:"F d, Y" }}</p>
+                    </div>
+                    
+                    <p class="mb-4">Please rate your experience working with {{ profile.name }} as a client on this project.</p>
+                    
+                    <div class="mb-4">
+                        <h5 class="rating-label">Overall Rating</h5>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" {% if form.rating.value == 5 %}checked{% endif %}>
+                            <label for="star5" title="5 stars">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" {% if form.rating.value == 4 %}checked{% endif %}>
+                            <label for="star4" title="4 stars">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" {% if form.rating.value == 3 %}checked{% endif %}>
+                            <label for="star3" title="3 stars">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" {% if form.rating.value == 2 %}checked{% endif %}>
+                            <label for="star2" title="2 stars">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" {% if form.rating.value == 1 %}checked{% endif %}>
+                            <label for="star1" title="1 star">★</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-factors">
+                        <h5 class="rating-label">Rate Specific Factors</h5>
+                        
+                        <div class="rating-factor">
+                            <label>Clear Requirements</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="requirements1" name="requirements" value="1" {% if form.requirements.value == 1 %}checked{% endif %}>
+                                <label for="requirements1">Poor</label>
+                                <input type="radio" id="requirements2" name="requirements" value="2" {% if form.requirements.value == 2 %}checked{% endif %}>
+                                <label for="requirements2">Fair</label>
+                                <input type="radio" id="requirements3" name="requirements" value="3" {% if form.requirements.value == 3 %}checked{% endif %}>
+                                <label for="requirements3">Good</label>
+                                <input type="radio" id="requirements4" name="requirements" value="4" {% if form.requirements.value == 4 %}checked{% endif %}>
+                                <label for="requirements4">Very Good</label>
+                                <input type="radio" id="requirements5" name="requirements" value="5" {% if form.requirements.value == 5 %}checked{% endif %}>
+                                <label for="requirements5">Excellent</label>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-factor">
+                            <label>Communication</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="communication1" name="communication" value="1" {% if form.communication.value == 1 %}checked{% endif %}>
+                                <label for="communication1">Poor</label>
+                                <input type="radio" id="communication2" name="communication" value="2" {% if form.communication.value == 2 %}checked{% endif %}>
+                                <label for="communication2">Fair</label>
+                                <input type="radio" id="communication3" name="communication" value="3" {% if form.communication.value == 3 %}checked{% endif %}>
+                                <label for="communication3">Good</label>
+                                <input type="radio" id="communication4" name="communication" value="4" {% if form.communication.value == 4 %}checked{% endif %}>
+                                <label for="communication4">Very Good</label>
+                                <input type="radio" id="communication5" name="communication" value="5" {% if form.communication.value == 5 %}checked{% endif %}>
+                                <label for="communication5">Excellent</label>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-factor">
+                            <label>Payment Promptness</label>
+                            <div class="factor-rating">
+                                <input type="radio" id="payment1" name="payment" value="1" {% if form.payment.value == 1 %}checked{% endif %}>
+                                <label for="payment1">Poor</label>
+                                <input type="radio" id="payment2" name="payment" value="2" {% if form.payment.value == 2 %}checked{% endif %}>
+                                <label for="payment2">Fair</label>
+                                <input type="radio" id="payment3" name="payment" value="3" {% if form.payment.value == 3 %}checked{% endif %}>
+                                <label for="payment3">Good</label>
+                                <input type="radio" id="payment4" name="payment" value="4" {% if form.payment.value == 4 %}checked{% endif %}>
+                                <label for="payment4">Very Good</label>
+                                <input type="radio" id="payment5" name="payment" value="5" {% if form.payment.value == 5 %}checked{% endif %}>
+                                <label for="payment5">Excellent</label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="comment-field">
+                        <h5 class="rating-label">Leave a Comment</h5>
+                        {{ form.comment }}
+                    </div>
+                    
+                    <div class="rating-actions">
+                        <button type="submit" class="btn btn-primary">Submit Rating</button>
+                        <a href="{% url 'profile' profile.id %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

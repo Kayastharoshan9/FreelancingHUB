@@ -1,0 +1,294 @@
+{% extends 'main.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Submit Verification | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verification-page {
+        padding: 60px 0;
+        background-color: #f8f9fa;
+    }
+    
+    .verification-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .verification-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .verification-title {
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .verification-subtitle {
+        color: #6c757d;
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .verification-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .verification-section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .verification-section-title i {
+        margin-right: 10px;
+        color: #4a6cf7;
+        font-size: 22px;
+    }
+    
+    .benefits-list {
+        margin-bottom: 30px;
+    }
+    
+    .benefit-item {
+        display: flex;
+        margin-bottom: 15px;
+    }
+    
+    .benefit-icon {
+        flex: 0 0 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e3f2fd;
+        color: #4a6cf7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    
+    .benefit-text {
+        flex: 1;
+    }
+    
+    .benefit-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+    
+    .benefit-description {
+        color: #6c757d;
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+    
+    .upload-field {
+        margin-bottom: 20px;
+    }
+    
+    .upload-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .upload-btn {
+        border: 1px dashed #ced4da;
+        color: #6c757d;
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        font-size: 15px;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-btn:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+    }
+    
+    .info-text {
+        color: #6c757d;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    
+    .error-text {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    
+    .submit-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: #4a6cf7;
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+    
+    .submit-btn:hover {
+        background-color: #3a5bd9;
+        transform: translateY(-2px);
+    }
+    
+    .cancel-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: transparent;
+        color: #6c757d;
+        border: 1px solid #6c757d;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+        margin-right: 15px;
+    }
+    
+    .cancel-btn:hover {
+        color: #4a6cf7;
+        border-color: #4a6cf7;
+    }
+    
+    .verification-illustration {
+        max-width: 200px;
+        margin: 0 auto 30px;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="verification-page">
+    <div class="container verification-container">
+        <div class="verification-header">
+            <img src="https://cdn.pixabay.com/photo/2022/02/18/16/09/verification-7020927_960_720.png" alt="Verification" class="verification-illustration">
+            <h1 class="verification-title">Account Verification</h1>
+            <p class="verification-subtitle">Complete the verification process to increase your trust score and get more clients.</p>
+        </div>
+        
+        <div class="verification-card">
+            <h3 class="verification-section-title">
+                <i class="fas fa-shield-alt"></i>
+                Benefits of Verification
+            </h3>
+            
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <h5 class="benefit-title">Verified Badge</h5>
+                        <p class="benefit-description">Get a verified badge on your profile that distinguishes you from other freelancers.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <h5 class="benefit-title">Higher Visibility</h5>
+                        <p class="benefit-description">Verified profiles get higher visibility in search results and project recommendations.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <h5 class="benefit-title">Build Trust</h5>
+                        <p class="benefit-description">Clients are more likely to hire freelancers with verified accounts.</p>
+                    </div>
+                </div>
+                
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="benefit-text">
+                        <h5 class="benefit-title">Higher Earnings</h5>
+                        <p class="benefit-description">Verified freelancers can charge premium rates for their services.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <form method="POST" action="{% url 'submit-verification' %}" enctype="multipart/form-data" class="verification-card">
+            {% csrf_token %}
+            
+            <h3 class="verification-section-title">
+                <i class="fas fa-id-card"></i>
+                Upload Verification Documents
+            </h3>
+            
+            <div class="row">
+                {% for field in form %}
+                <div class="col-md-6">
+                    <div class="upload-field">
+                        <label for="{{ field.id_for_label }}" class="upload-label">{{ field.label }}</label>
+                        {% if field.help_text %}
+                        <div class="info-text mb-2">{{ field.help_text }}</div>
+                        {% endif %}
+                        <div class="upload-btn-wrapper">
+                            {{ field|add_class:"form-control" }}
+                        </div>
+                        {% for error in field.errors %}
+                        <p class="error-text">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="mt-4 info-text">
+                <p><i class="fas fa-info-circle me-2"></i> All documents should be clear, high-resolution images in JPG, PNG, or PDF format.</p>
+                <p><i class="fas fa-lock me-2"></i> Your documents are securely stored and only used for verification purposes. They are not shared with clients or other users.</p>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'account' %}" class="cancel-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane me-2"></i>Submit for Verification
+                </button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}

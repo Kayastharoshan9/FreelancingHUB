@@ -1,0 +1,124 @@
+{% load static %}
+
+<!-- Header Section -->
+<header class="header">
+    <div class="container container--narrow">
+        <a href="{% url 'home' %}" class="header__logo">
+            <img src="{% static 'img/logo.svg' %}" alt="FreelanceHub" />
+        </a>
+        <nav class="header__nav">
+            <input type="checkbox" id="responsive-menu" />
+            <label for="responsive-menu" class="toggle-menu">
+                <span>Menu</span>
+                <div class="toggle-menu__lines"></div>
+            </label>
+            <ul class="header__menu">
+                <!-- Common options for all -->
+                <li class="header__menuItem">
+                    <a href="{% url 'projects' %}">
+                        <i class="fas fa-project-diagram"></i>
+                        Projects
+                    </a>
+                </li>
+                
+                {% if request.user.is_authenticated %}
+                    <!-- AI Matching for all authenticated users -->
+                    <li class="header__menuItem">
+                        <a href="{% url 'ai-matching' %}">
+                            <i class="fas fa-magic"></i>
+                            AI Matching
+                        </a>
+                    </li>
+                    
+                    <!-- Show freelancers to clients -->
+                    {% if profile.user_type == 'client' or profile.user_type == 'both' %}
+                    <li class="header__menuItem">
+                        <a href="{% url 'profiles' %}">
+                            <i class="fas fa-users"></i>
+                            Freelancers
+                        </a>
+                    </li>
+                    <li class="header__menuItem">
+                        <a href="{% url 'create-project' %}">
+                            <i class="fas fa-plus-circle"></i>
+                            Post Project
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Show jobs to freelancers -->
+                    {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+                    <li class="header__menuItem">
+                        <a href="{% url 'jobs' %}">
+                            <i class="fas fa-briefcase"></i>
+                            Jobs
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- Dropdown menu for authenticated users -->
+                    <li class="header__menuItem dropdown">
+                        <a class="dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar user-avatar-sm">
+                                {% if profile.profile_image %}
+                                <img src="{{ profile.imageURL }}" alt="{{ profile.name }}">
+                                {% else %}
+                                {{ profile.name|slice:":1" }}
+                                {% endif %}
+                            </div>
+                            <span>{{ profile.name }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li class="dropdown-item-text">{{ profile.name }}</li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'inbox' %}">
+                                    <i class="fas fa-envelope me-2"></i>Messages
+                                    {% if unread_count > 0 %}
+                                    <span class="badge rounded-pill bg-danger ms-2" style="font-size: 0.7rem;">{{ unread_count }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'transactions' %}">
+                                    <i class="fas fa-money-bill-wave me-2"></i>Transactions
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'edit-account' %}">
+                                    <i class="fas fa-user"></i> Account
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <!-- Options for unauthenticated users -->
+                    <li class="header__menuItem">
+                        <a href="{% url 'profiles' %}">
+                            <i class="fas fa-users"></i>
+                            Freelancers
+                        </a>
+                    </li>
+                    <li class="header__menuItem">
+                        <a href="{% url 'jobs' %}">
+                            <i class="fas fa-briefcase"></i>
+                            Jobs
+                        </a>
+                    </li>
+                    <li class="header__menuItem">
+                        <a href="{% url 'login' %}" class="btn btn--sub">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login/Sign Up
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</header>

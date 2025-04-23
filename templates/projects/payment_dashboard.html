@@ -1,0 +1,130 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="payment-dashboard container">
+    <h1 class="mb-4">Payment Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" id="paymentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="client-tab" data-toggle="tab" href="#client-payments" role="tab" aria-controls="client-payments" aria-selected="true">My Payments as Client</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="freelancer-tab" data-toggle="tab" href="#freelancer-payments" role="tab" aria-controls="freelancer-payments" aria-selected="false">My Earnings as Freelancer</a>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="paymentTabsContent">
+                <!-- Client Payments Tab -->
+                <div class="tab-pane fade show active" id="client-payments" role="tabpanel" aria-labelledby="client-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            {% if client_payments %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Job</th>
+                                                <th>Milestone</th>
+                                                <th>Freelancer</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for payment in client_payments %}
+                                                <tr>
+                                                    <td>{{ payment.created|date:"M d, Y" }}</td>
+                                                    <td><a href="{% url 'job-detail' payment.milestone.job.id %}">{{ payment.milestone.job.title }}</a></td>
+                                                    <td>{{ payment.milestone.title }}</td>
+                                                    <td><a href="{% url 'user-profile' payment.freelancer.id %}">{{ payment.freelancer.name }}</a></td>
+                                                    <td>${{ payment.amount }}</td>
+                                                    <td>
+                                                        {% if payment.status == 'pending' %}
+                                                            <span class="badge badge-warning">Pending</span>
+                                                        {% elif payment.status == 'escrow' %}
+                                                            <span class="badge badge-info">In Escrow</span>
+                                                        {% elif payment.status == 'released' %}
+                                                            <span class="badge badge-success">Released</span>
+                                                        {% elif payment.status == 'refunded' %}
+                                                            <span class="badge badge-danger">Refunded</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if payment.status == 'escrow' and payment.milestone.is_completed %}
+                                                            <a href="{% url 'release-payment' payment.milestone.id %}" class="btn btn-sm btn-success">Release Payment</a>
+                                                        {% elif payment.status == 'escrow' %}
+                                                            <button class="btn btn-sm btn-outline-secondary" disabled>Awaiting Completion</button>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    You haven't made any payments as a client yet.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Freelancer Payments Tab -->
+                <div class="tab-pane fade" id="freelancer-payments" role="tabpanel" aria-labelledby="freelancer-tab">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            {% if freelancer_payments %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Job</th>
+                                                <th>Milestone</th>
+                                                <th>Client</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for payment in freelancer_payments %}
+                                                <tr>
+                                                    <td>{{ payment.created|date:"M d, Y" }}</td>
+                                                    <td><a href="{% url 'job-detail' payment.milestone.job.id %}">{{ payment.milestone.job.title }}</a></td>
+                                                    <td>{{ payment.milestone.title }}</td>
+                                                    <td><a href="{% url 'user-profile' payment.client.id %}">{{ payment.client.name }}</a></td>
+                                                    <td>${{ payment.amount }}</td>
+                                                    <td>
+                                                        {% if payment.status == 'pending' %}
+                                                            <span class="badge badge-warning">Pending</span>
+                                                        {% elif payment.status == 'escrow' %}
+                                                            <span class="badge badge-info">In Escrow</span>
+                                                        {% elif payment.status == 'released' %}
+                                                            <span class="badge badge-success">Released</span>
+                                                        {% elif payment.status == 'refunded' %}
+                                                            <span class="badge badge-danger">Refunded</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    You haven't received any payments as a freelancer yet.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Choose Payment Method | {{ milestone.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-option {
+        padding: 30px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .payment-option:hover {
+        border-color: #4285F4;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .payment-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #4285F4;
+    }
+    
+    .payment-heading {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    
+    .milestone-info {
+        background-color: #f1f8ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-heading">
+    <h1>Choose Payment Method</h1>
+    <p class="text-muted">Select how you'd like to pay for this milestone.</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="row">
+            <!-- Checkout Option -->
+            <div class="col-md-6">
+                <div class="payment-option text-center">
+                    <div class="payment-icon">
+                        <i class="fab fa-cc-stripe"></i>
+                    </div>
+                    <h3>Stripe Checkout</h3>
+                    <p>Use Stripe's secure checkout page to pay with credit card.</p>
+                    <p class="text-muted small">Perfect for one-time payments. Simple and secure.</p>
+                    <a href="{% url 'create-checkout-session' milestone_id=milestone.id %}" class="btn btn-primary btn-lg mt-3">
+                        <i class="fas fa-credit-card me-2"></i>Continue to Checkout
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Direct Payment Option -->
+            <div class="col-md-6">
+                <div class="payment-option text-center">
+                    <div class="payment-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <h3>Direct Payment</h3>
+                    <p>Pay directly on this page with your credit card.</p>
+                    <p class="text-muted small">Stay on our site while processing your payment.</p>
+                    <form action="{% url 'escrow-payment' milestone_id=milestone.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary btn-lg mt-3">
+                            <i class="fas fa-arrow-right me-2"></i>Continue to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle me-2"></i>
+            <span>Both payment methods are secure and processed by Stripe. Your payment information is never stored on our servers.</span>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Milestone Information -->
+        <div class="milestone-info">
+            <h4>Payment Summary</h4>
+            <hr>
+            <div class="d-flex justify-content-between mb-2">
+                <span><strong>Project:</strong></span>
+                <span>{{ job.title }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span><strong>Milestone:</strong></span>
+                <span>{{ milestone.title }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span><strong>Amount:</strong></span>
+                <span>${{ milestone.amount }}</span>
+            </div>
+            {% if milestone.due_date %}
+            <div class="d-flex justify-content-between mb-2">
+                <span><strong>Due Date:</strong></span>
+                <span>{{ milestone.due_date|date:"M d, Y" }}</span>
+            </div>
+            {% endif %}
+            <hr>
+            <div class="d-flex justify-content-between">
+                <span><strong>Total:</strong></span>
+                <span class="h5">${{ milestone.amount }}</span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Secure Payment</h5>
+            </div>
+            <div class="card-body">
+                <p>Your payment is secure and protected by industry-standard encryption.</p>
+                <div class="d-flex justify-content-center mt-3">
+                    <i class="fab fa-cc-visa mx-2 fa-2x text-muted"></i>
+                    <i class="fab fa-cc-mastercard mx-2 fa-2x text-muted"></i>
+                    <i class="fab fa-cc-amex mx-2 fa-2x text-muted"></i>
+                    <i class="fab fa-cc-discover mx-2 fa-2x text-muted"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Project
+    </a>
+</div>
+{% endblock %}

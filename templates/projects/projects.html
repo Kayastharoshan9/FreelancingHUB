@@ -1,0 +1,230 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Projects Showcase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-title {
+        position: relative;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--color-main);
+    }
+    
+    .project-slider {
+        margin-bottom: 60px;
+    }
+    
+    .project-card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .project-img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+    
+    .project-content {
+        padding: 20px;
+    }
+    
+    .project-tags {
+        margin-top: 10px;
+    }
+    
+    .project-tag {
+        background-color: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    
+    .votes {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .votes-icon {
+        margin-right: 5px;
+        color: #ffc107;
+    }
+    
+    .empty-state {
+        padding: 50px 20px;
+        text-align: center;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .see-all-link {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Projects Showcase</h1>
+        {% if request.user.is_authenticated and request.user.profile.user_type != 'freelancer' %}
+        <a href="{% url 'create-project' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i>Post New Project
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="GET" action="{% url 'projects' %}">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search projects..." name="search" value="{{ request.GET.search }}">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if recommended_projects %}
+    <section class="project-slider">
+        <div class="section-header">
+            <h2 class="section-title">Recommended Projects</h2>
+        </div>
+        <div class="row">
+            {% for project in recommended_projects %}
+            <div class="col-md-4 mb-4">
+                <div class="project-card h-100">
+                    <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="project-img">
+                    <div class="project-content">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5>
+                                {% if project.id %}
+                                <a href="{% url 'project' pk=project.id %}" class="text-decoration-none text-dark">{{ project.title }}</a>
+                                {% else %}
+                                <span class="text-dark">{{ project.title }}</span>
+                                {% endif %}
+                            </h5>
+                            <div class="votes">
+                                <i class="fas fa-thumbs-up votes-icon"></i>
+                                <span>{{ project.vote_ratio|default:"0" }}% ({{ project.vote_total|default:"0" }})</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small">By: {{ project.owner.name }}</p>
+                        <p class="text-truncate">{{ project.description|default:"" }}</p>
+                        <div class="project-tags">
+                            {% for tag in project.tags.all %}
+                            <span class="project-tag">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'project' pk=project.id %}" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% elif user.is_authenticated and user.is_staff %}
+    <!-- Admin notice for missing OpenAI API key -->
+    <div class="container my-4">
+        <div class="alert alert-warning">
+            <h4><i class="fas fa-exclamation-triangle"></i> AI Recommendations Disabled</h4>
+            <p>The AI recommendation system is not showing recommended projects because the OpenAI API key is not configured.</p>
+            <p><strong>To enable recommendations:</strong></p>
+            <ol>
+                <li>Set the <code>OPENAI_API_KEY</code> environment variable, or</li>
+                <li>Add your API key to <code>config/env.py</code> file</li>
+            </ol>
+            <p>After adding the API key, restart the server for changes to take effect.</p>
+        </div>
+    </div>
+    {% endif %}
+    
+    <section class="project-slider">
+        <div class="section-header">
+            <h2 class="section-title">All Projects</h2>
+        </div>
+        {% if projects %}
+        <div class="row">
+            {% for project in projects %}
+            <div class="col-md-4 mb-4">
+                <div class="project-card h-100">
+                    <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="project-img">
+                    <div class="project-content">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5>
+                                {% if project.id %}
+                                <a href="{% url 'project' pk=project.id %}" class="text-decoration-none text-dark">{{ project.title }}</a>
+                                {% else %}
+                                <span class="text-dark">{{ project.title }}</span>
+                                {% endif %}
+                            </h5>
+                            <div class="votes">
+                                <i class="fas fa-thumbs-up votes-icon"></i>
+                                <span>{{ project.vote_ratio }}% ({{ project.vote_total }})</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small">By: {{ project.owner.name }}</p>
+                        <p class="text-truncate">{{ project.description }}</p>
+                        <div class="project-tags">
+                            {% for tag in project.tags.all %}
+                            <span class="project-tag">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'project' pk=project.id %}" class="btn btn-sm btn-outline-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-folder-open fa-4x text-muted mb-3"></i>
+            <h3>No projects found</h3>
+            <p class="text-muted">Be the first to showcase your work!</p>
+            {% if request.user.is_authenticated and request.user.profile.user_type != 'freelancer' %}
+            <a href="{% url 'create-project' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus-circle me-2"></i>Add Project
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

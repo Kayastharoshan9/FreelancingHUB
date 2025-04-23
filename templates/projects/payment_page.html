@@ -1,0 +1,56 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="payment-page container">
+    <div class="card">
+        <div class="card-body">
+            <h1 class="card-title text-center mb-4">Fund Milestone</h1>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>Job Details</h4>
+                    <p><strong>Title:</strong> {{ milestone.job.title }}</p>
+                    <p><strong>Client:</strong> {{ milestone.job.client.name }}</p>
+                    <p><strong>Freelancer:</strong> {{ milestone.job.freelancer.name }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h4>Milestone Details</h4>
+                    <p><strong>Title:</strong> {{ milestone.title }}</p>
+                    <p><strong>Description:</strong> {{ milestone.description }}</p>
+                    <p><strong>Due Date:</strong> {{ milestone.due_date|date:"M d, Y" }}</p>
+                </div>
+            </div>
+            
+            <div class="payment-amount text-center mb-4">
+                <h2>Payment Amount</h2>
+                <div class="display-4">${{ milestone.amount }}</div>
+            </div>
+            
+            <div class="payment-info mb-4">
+                <div class="alert alert-info">
+                    <h5>How Escrow Payments Work</h5>
+                    <ol>
+                        <li>You fund the milestone and the money is securely held in escrow.</li>
+                        <li>The freelancer works on and completes the milestone.</li>
+                        <li>Once you're satisfied with the work, you release the payment to the freelancer.</li>
+                        <li>If there are any disputes, our support team can help mediate.</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="{% url 'create-checkout-session' milestone.id %}" class="btn btn-lg btn-success">
+                    <i class="fas fa-credit-card mr-2"></i> Pay with Stripe
+                </a>
+                <a href="{% url 'job-detail' milestone.job.id %}" class="btn btn-lg btn-outline-secondary ml-3">Cancel</a>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <small class="text-muted">
+                    <i class="fas fa-lock mr-1"></i> Payments are securely processed by Stripe. Your payment information is never stored on our servers.
+                </small>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

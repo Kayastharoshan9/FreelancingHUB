@@ -1,0 +1,184 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}
+    {% if job %}
+        Edit Job
+    {% else %}
+        Post a Job
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .form-section {
+        margin-bottom: 30px;
+    }
+    .job-tips {
+        background-color: #e9f7ef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+    .tip-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+    .tip-icon {
+        margin-right: 10px;
+        color: #27ae60;
+    }
+    .skills-container {
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .skills-container .form-check {
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-container">
+        <h1 class="mb-4">
+            {% if job %}
+                Edit Job
+            {% else %}
+                Post a Job
+            {% endif %}
+        </h1>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h4>Basic Information</h4>
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Job Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Job Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small">{{ form.description.errors }}</div>
+                    {% endif %}
+                    <div class="form-text">Describe the project in detail, including specific requirements, deliverables, and any qualifications needed.</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h4>Project Details</h4>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.job_type.id_for_label }}" class="form-label">Job Type</label>
+                        {{ form.job_type }}
+                        {% if form.job_type.errors %}
+                            <div class="text-danger small">{{ form.job_type.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.location.id_for_label }}" class="form-label">Location</label>
+                        {{ form.location }}
+                        {% if form.location.errors %}
+                            <div class="text-danger small">{{ form.location.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Enter "Remote" if this job can be done from anywhere.</div>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.budget_min.id_for_label }}" class="form-label">Minimum Budget ($)</label>
+                        {{ form.budget_min }}
+                        {% if form.budget_min.errors %}
+                            <div class="text-danger small">{{ form.budget_min.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.budget_max.id_for_label }}" class="form-label">Maximum Budget ($)</label>
+                        {{ form.budget_max }}
+                        {% if form.budget_max.errors %}
+                            <div class="text-danger small">{{ form.budget_max.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.deadline.id_for_label }}" class="form-label">Deadline</label>
+                    {{ form.deadline }}
+                    {% if form.deadline.errors %}
+                        <div class="text-danger small">{{ form.deadline.errors }}</div>
+                    {% endif %}
+                    <div class="form-text">When do you need this project completed by? (Optional)</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h4>Required Skills</h4>
+                <div class="skills-container">
+                    {{ form.required_skills }}
+                </div>
+                {% if form.required_skills.errors %}
+                    <div class="text-danger small">{{ form.required_skills.errors }}</div>
+                {% endif %}
+                <div class="form-text">Select all skills that are relevant to this job.</div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'jobs' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>
+                        {% if job %}
+                            Update Job
+                        {% else %}
+                            Post Job
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="job-tips">
+            <h5><i class="fas fa-lightbulb me-2"></i>Tips for a Great Job Posting</h5>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Be specific about what you're looking for and what the deliverables are.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Include clear requirements and any necessary qualifications.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Set a realistic budget range that reflects the scope of work.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Specify your preferred timeline and any important deadlines.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>List all relevant skills to attract the right freelancers.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

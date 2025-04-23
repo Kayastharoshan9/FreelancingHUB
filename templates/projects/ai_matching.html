@@ -1,0 +1,312 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}AI Matching | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .matching-section {
+        margin-bottom: 60px;
+    }
+    
+    .match-card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .match-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .match-header {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .match-score {
+        background: linear-gradient(135deg, #4a00e0, #8e2de2);
+        color: white;
+        border-radius: 30px;
+        padding: 5px 15px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .match-body {
+        padding: 20px;
+        flex-grow: 1;
+    }
+    
+    .match-img {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+    }
+    
+    .match-reasons {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    
+    .match-reasons h5 {
+        font-size: 15px;
+        margin-bottom: 10px;
+        color: #4a6cf7;
+    }
+    
+    .match-reasons ul {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+    
+    .match-reasons li {
+        margin-bottom: 5px;
+    }
+    
+    .match-footer {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .profile-small {
+        display: flex;
+        align-items: center;
+    }
+    
+    .profile-small img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+    
+    .section-title {
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--color-main);
+    }
+    
+    .job-match-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .job-match-header {
+        padding: 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .job-match-body {
+        padding: 20px;
+    }
+    
+    .freelancer-match-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-radius: 8px;
+        background: #f8f9fa;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .freelancer-match-item:hover {
+        background: #e9ecef;
+    }
+    
+    .freelancer-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+    
+    .freelancer-info {
+        flex: 1;
+    }
+    
+    .freelancer-name {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .freelancer-score {
+        background: linear-gradient(135deg, #4a00e0, #8e2de2);
+        color: white;
+        border-radius: 30px;
+        padding: 5px 15px;
+        font-weight: 600;
+        font-size: 13px;
+        margin-left: 15px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .empty-state i {
+        font-size: 40px;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">AI Matching Dashboard</h1>
+    <p class="lead mb-5">Our AI algorithm analyzes profiles, skills, and project requirements to provide the most relevant matches for you.</p>
+    
+    <!-- Client Section: Matching freelancers for jobs -->
+    {% if profile.user_type == 'client' or profile.user_type == 'both' %}
+    <div class="matching-section">
+        <h2 class="section-title">Matching Freelancers for Your Jobs</h2>
+        
+        {% if job_matches %}
+            {% for job_match in job_matches %}
+            <div class="job-match-container">
+                <div class="job-match-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">{{ job_match.job.title }}</h3>
+                        <a href="{% url 'job-matching' job_match.job.id %}" class="btn btn-sm btn-outline-primary">
+                            View All Matches
+                        </a>
+                    </div>
+                    <p class="text-muted mt-2 mb-0">{{ job_match.job.description|truncatechars:150 }}</p>
+                </div>
+                
+                <div class="job-match-body">
+                    <h4 class="h6 mb-3">Top Matching Freelancers:</h4>
+                    
+                    {% if job_match.matches %}
+                        <div class="freelancer-matches">
+                            {% for match in job_match.matches %}
+                            <div class="freelancer-match-item">
+                                <img src="{{ match.profile.imageURL }}" alt="{{ match.profile.name }}" class="freelancer-avatar">
+                                <div class="freelancer-info">
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="freelancer-name mb-0">{{ match.profile.name }}</h5>
+                                        <span class="freelancer-score">{{ match.score }}% Match</span>
+                                    </div>
+                                    <p class="mb-2 text-muted">{{ match.profile.short_intro|truncatechars:100 }}</p>
+                                    
+                                    {% if match.reasons %}
+                                    <small class="text-primary">Match reason: {{ match.reasons.0 }}</small>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'profile' match.profile.id %}" class="btn btn-sm btn-primary ms-3">View Profile</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">No matching freelancers found for this job.</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-briefcase"></i>
+                <h3>No Active Jobs</h3>
+                <p class="text-muted">Post a job to find matching freelancers for your projects.</p>
+                <a href="{% url 'create-job' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus-circle me-2"></i>Post a Job
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Freelancer Section: Matching projects -->
+    {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+    <div class="matching-section">
+        <h2 class="section-title">Projects That Match Your Skills</h2>
+        
+        {% if matching_projects %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for match in matching_projects %}
+                <div class="col">
+                    <div class="match-card h-100">
+                        <div class="match-header">
+                            <h3 class="h5 mb-0">{{ match.project.title }}</h3>
+                            <span class="match-score">{{ match.score }}% Match</span>
+                        </div>
+                        
+                        <img src="{{ match.project.imageURL }}" alt="{{ match.project.title }}" class="match-img">
+                        
+                        <div class="match-body">
+                            <p class="text-muted">{{ match.project.description|truncatechars:150 }}</p>
+                            
+                            {% if match.reasons %}
+                            <div class="match-reasons">
+                                <h5><i class="fas fa-thumbs-up me-2"></i>Why This Matches You:</h5>
+                                <ul>
+                                    {% for reason in match.reasons %}
+                                    <li>{{ reason }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="match-footer">
+                            <div class="profile-small">
+                                <img src="{{ match.project.owner.imageURL }}" alt="{{ match.project.owner.name }}">
+                                <span class="text-muted">{{ match.project.owner.name }}</span>
+                            </div>
+                            
+                            <a href="{% url 'project' pk=match.project.id %}" class="btn btn-sm btn-primary">View Project</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-code"></i>
+                <h3>No Matching Projects</h3>
+                <p class="text-muted">Update your skills and profile to improve matching with available projects.</p>
+                <a href="{% url 'edit-account' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-user-edit me-2"></i>Update Profile
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

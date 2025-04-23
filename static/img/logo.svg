@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="40px" viewBox="0 0 200 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>FreelanceHub Logo</title>
+    <g id="Logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <text font-family="Arial-BoldMT, Arial" font-size="20" font-weight="bold" fill="#2D3748">
+            <tspan x="10" y="28">FreelanceHub</tspan>
+        </text>
+        <circle fill="#4263EB" cx="180" cy="20" r="10"></circle>
+    </g>
+</svg>

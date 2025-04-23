@@ -1,0 +1,187 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+<main class="container mt-5">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="text-primary mb-4">AI-Powered Matching Dashboard</h1>
+            <p class="lead">
+                Our advanced AI algorithms analyze your profile and available jobs to find the best matches for you.
+                These matches are based on your skills, experience, past projects, and other factors.
+            </p>
+        </div>
+    </div>
+
+    {% if user_profile.user_type == 'client' or user_profile.user_type == 'both' %}
+    <!-- Matching freelancers for client jobs -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-primary mb-3">Matching Freelancers for Your Jobs</h2>
+            
+            {% if jobs_with_matching_freelancers %}
+                {% for job_item in jobs_with_matching_freelancers %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">{{ job_item.job.title }}</h3>
+                        <a href="{% url 'job-matching' job_item.job.id %}" class="btn btn-sm btn-outline-primary">View All Matches</a>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">{{ job_item.job.description|truncatewords:30 }}</p>
+                        
+                        {% if job_item.matches %}
+                        <h4 class="h6 mb-3">Top Freelancer Matches:</h4>
+                        <div class="list-group">
+                            {% for match in job_item.matches|slice:":3" %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{ match.profile.imageURL }}" class="rounded-circle me-3" width="40" height="40" alt="{{ match.profile.name }}">
+                                        <div>
+                                            <h5 class="mb-1">{{ match.profile.name }}</h5>
+                                            <p class="mb-1 text-muted">{{ match.profile.short_intro|truncatechars:50 }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">{{ match.score }}% Match</span>
+                                </div>
+                                {% if match.reasons %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Match reasons:</small>
+                                    <ul class="small mb-0 ps-3">
+                                        {% for reason in match.reasons %}
+                                        <li>{{ reason }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">No matches found for this job yet.</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                You dont have any active jobs without assigned freelancers. 
+                <a href="{% url 'create-job' %}" class="alert-link">Post a job</a> to see matching freelancers.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user_profile.user_type == 'freelancer' or user_profile.user_type == 'both' %}
+    <!-- Matching projects for freelancers -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-primary mb-3">Projects That Match Your Skills</h2>
+            
+            {% if matching_projects %}
+            <div class="row">
+                {% for match in matching_projects %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="h5 mb-0">{{ match.project.title }}</h3>
+                            <span class="badge bg-primary rounded-pill">{{ match.score }}% Match</span>
+                        </div>
+                        <img src="{{ match.project.imageURL }}" class="card-img-top" alt="{{ match.project.title }}">
+                        <div class="card-body">
+                            <p class="text-muted mb-3">{{ match.project.description|truncatewords:25 }}</p>
+                            
+                            {% if match.reasons %}
+                            <h4 class="h6 mb-2">Why this is a good match:</h4>
+                            <ul class="small mb-3">
+                                {% for reason in match.reasons %}
+                                <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'project' match.project.id %}" class="btn btn-outline-primary btn-sm">View Project</a>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ match.project.owner.imageURL }}" class="rounded-circle me-1" width="25" height="25" alt="{{ match.project.owner.name }}">
+                                    <small class="text-muted">{{ match.project.owner.name }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No matching projects found. Try updating your skills and profile to improve matching.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Matching jobs for freelancers -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-primary mb-3">Jobs That Match Your Skills</h2>
+            
+            {% if matching_jobs %}
+            <div class="row">
+                {% for match in matching_jobs %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h3 class="h5 mb-0">{{ match.job.title }}</h3>
+                            <span class="badge bg-primary rounded-pill">{{ match.score }}% Match</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="badge bg-secondary">{{ match.job.get_job_type_display }}</span>
+                                <span class="text-success">${{ match.job.budget_min }} - ${{ match.job.budget_max }}</span>
+                            </div>
+                            
+                            <p class="text-muted mb-3">{{ match.job.description|truncatewords:25 }}</p>
+                            
+                            {% if match.reasons %}
+                            <h4 class="h6 mb-2">Why this is a good match:</h4>
+                            <ul class="small mb-3">
+                                {% for reason in match.reasons %}
+                                <li>{{ reason }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'job' match.job.id %}" class="btn btn-outline-primary btn-sm">View Job</a>
+                                <a href="{% url 'create-bid' match.job.id %}" class="btn btn-primary btn-sm">Place Bid</a>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ match.job.client.imageURL }}" class="rounded-circle me-2" width="30" height="30" alt="{{ match.job.client.name }}">
+                                <div>
+                                    <small class="text-muted">Posted by: <strong>{{ match.job.client.name }}</strong></small>
+                                    <br>
+                                    <small class="text-muted">{{ match.job.created|timesince }} ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No matching jobs found. Try updating your skills and profile to improve matching.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+</main>
+{% endblock content %}

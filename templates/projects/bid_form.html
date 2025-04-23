@@ -1,0 +1,181 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Submit Proposal - {{ job.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .job-summary {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .job-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    .meta-item {
+        margin-right: 20px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .meta-item i {
+        margin-right: 5px;
+        color: #6c757d;
+    }
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .form-section {
+        margin-bottom: 30px;
+    }
+    .bid-tips {
+        background-color: #e9f7ef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .tip-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+    .tip-icon {
+        margin-right: 10px;
+        color: #27ae60;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-container">
+        <h1 class="mb-4">
+            {% if bid %}
+                Edit Your Proposal
+            {% else %}
+                Submit a Proposal
+            {% endif %}
+        </h1>
+        
+        <div class="job-summary">
+            <div class="job-title">{{ job.title }}</div>
+            <div class="job-meta">
+                <div class="meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>{{ job.client.name }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>${{ job.budget_min }} - ${{ job.budget_max }}{% if job.job_type == 'hourly' %}/hr{% endif %}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>
+                        {% if job.job_type == 'fixed' %}
+                            Fixed Price
+                        {% else %}
+                            Hourly Rate
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            <div class="text-truncate">{{ job.description|truncatewords:30 }}</div>
+            <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-primary btn-sm mt-3">
+                <i class="fas fa-eye me-2"></i>View Full Job
+            </a>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h5>Your Bid</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.amount.id_for_label }}" class="form-label">{{ form.amount.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            {{ form.amount }}
+                        </div>
+                        {% if form.amount.help_text %}
+                            <div class="form-text">{{ form.amount.help_text }}</div>
+                        {% endif %}
+                        {% if form.amount.errors %}
+                            <div class="text-danger small">{{ form.amount.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.delivery_time.id_for_label }}" class="form-label">Delivery Time (days)</label>
+                        {{ form.delivery_time }}
+                        {% if form.delivery_time.help_text %}
+                            <div class="form-text">{{ form.delivery_time.help_text }}</div>
+                        {% endif %}
+                        {% if form.delivery_time.errors %}
+                            <div class="text-danger small">{{ form.delivery_time.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h5>Proposal</h5>
+                <label for="{{ form.proposal.id_for_label }}" class="form-label">Describe why you're a good fit for this job</label>
+                {{ form.proposal }}
+                {% if form.proposal.help_text %}
+                    <div class="form-text">{{ form.proposal.help_text }}</div>
+                {% endif %}
+                {% if form.proposal.errors %}
+                    <div class="text-danger small">{{ form.proposal.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-paper-plane me-2"></i>
+                    {% if bid %}
+                        Update Proposal
+                    {% else %}
+                        Submit Proposal
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+        
+        <div class="bid-tips">
+            <h5><i class="fas fa-lightbulb me-2"></i>Tips for a Winning Proposal</h5>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Be specific about how your skills and experience relate to the job requirements.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Include relevant examples of your past work.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Address how you plan to approach the project and what your process will be.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Be clear about your timeline and availability.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Proofread your proposal for spelling and grammar errors.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

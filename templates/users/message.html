@@ -1,0 +1,62 @@
+{% extends 'main.html' %}
+
+{% block title %}Message | FreelanceHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Messages</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'inbox' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-inbox me-2"></i> Inbox
+                            {% if unread_count > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ unread_count }}</span>
+                            {% endif %}
+                        </a>
+                        <a href="{% url 'account' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <a href="{% url 'create-message' message.sender.id %}" class="btn btn-primary">
+                    <i class="fas fa-reply me-2"></i>Reply
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ message.subject }}</h5>
+                    <a href="{% url 'inbox' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Inbox
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ message.sender.imageURL }}" alt="{{ message.sender.name }}" class="rounded-circle me-3" width="50" height="50">
+                        <div>
+                            <h6 class="mb-0">From: <a href="{% url 'profile' message.sender.id %}">{{ message.sender.name }}</a></h6>
+                            <small class="text-muted">{{ message.created|date:"F d, Y H:i" }}</small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="message-content">
+                        <p>{{ message.body|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

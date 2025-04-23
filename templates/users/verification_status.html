@@ -1,0 +1,439 @@
+{% extends 'main.html' %}
+
+{% block title %}Verification Status | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .verification-page {
+        padding: 60px 0;
+        background-color: #f8f9fa;
+    }
+    
+    .profile-sidebar {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        text-align: center;
+        height: 100%;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 20px;
+        border: 5px solid #f8f9fa;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .profile-name {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .profile-title {
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    
+    .profile-location {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .profile-location i {
+        margin-right: 5px;
+        color: #6c757d;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        color: #4a6cf7;
+        transition: all 0.3s ease;
+    }
+    
+    .social-link:hover {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .verification-card {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .verification-title {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .verification-badge {
+        position: relative;
+        display: inline-block;
+        margin: 0 auto 20px;
+    }
+    
+    .badge-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-size: 36px;
+    }
+    
+    .verified .badge-icon {
+        background-color: #d4edda;
+        color: #28a745;
+    }
+    
+    .pending .badge-icon {
+        background-color: #fff3cd;
+        color: #ffc107;
+    }
+    
+    .rejected .badge-icon {
+        background-color: #f8d7da;
+        color: #dc3545;
+    }
+    
+    .not-verified .badge-icon {
+        background-color: #e2e3e5;
+        color: #6c757d;
+    }
+    
+    .verification-status {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .verification-status h3 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .verification-status p {
+        color: #6c757d;
+    }
+    
+    .benefits-list {
+        padding-left: 20px;
+    }
+    
+    .benefits-list li {
+        margin-bottom: 10px;
+        position: relative;
+        padding-left: 15px;
+    }
+    
+    .benefits-list li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #4a6cf7;
+    }
+    
+    .trust-score-card {
+        text-align: center;
+    }
+    
+    .trust-score-value {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .trust-score-meter {
+        height: 12px;
+        background-color: #e9ecef;
+        border-radius: 6px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .trust-score-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 1s ease-in-out;
+    }
+    
+    .trust-score-low .trust-score-fill {
+        background: linear-gradient(90deg, #dc3545, #fd7e14);
+    }
+    
+    .trust-score-medium .trust-score-fill {
+        background: linear-gradient(90deg, #fd7e14, #ffc107);
+    }
+    
+    .trust-score-high .trust-score-fill {
+        background: linear-gradient(90deg, #28a745, #20c997);
+    }
+    
+    .trust-score-steps {
+        margin-top: 25px;
+    }
+    
+    .trust-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-left: 15px;
+    }
+    
+    .trust-step i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+    }
+    
+    .trust-step.completed {
+        color: #28a745;
+    }
+    
+    .trust-step.incomplete {
+        color: #6c757d;
+    }
+    
+    .action-btn {
+        display: inline-block;
+        padding: 10px 25px;
+        background-color: #4a6cf7;
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    
+    .action-btn:hover {
+        background-color: #3a5bd9;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="verification-page">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Profile Sidebar -->
+            <div class="col-lg-4">
+                <div class="profile-sidebar">
+                    <img src="{{ profile.imageURL }}" alt="{{ profile.name }}" class="profile-avatar" />
+                    <h3 class="profile-name">{{ profile.name }}</h3>
+                    <p class="profile-title">{{ profile.short_intro }}</p>
+                    <div class="profile-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ profile.location }}</span>
+                    </div>
+                    
+                    <div class="social-links">
+                        {% if profile.social_github %}
+                        <a href="{{ profile.social_github }}" target="_blank" class="social-link">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if profile.social_twitter %}
+                        <a href="{{ profile.social_twitter }}" target="_blank" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if profile.social_linkedin %}
+                        <a href="{{ profile.social_linkedin }}" target="_blank" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        {% endif %}
+
+                        {% if profile.social_website %}
+                        <a href="{{ profile.social_website }}" target="_blank" class="social-link">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'account' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Account
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Verification Content -->
+            <div class="col-lg-8">
+                <!-- Verification Status Card -->
+                <div class="verification-card">
+                    <h2 class="verification-title">Verification Status</h2>
+                    
+                    {% if profile.verification_status == 'verified' %}
+                    <div class="verification-status verified">
+                        <div class="badge-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3>Verified Account</h3>
+                        <p>Your account has been successfully verified.</p>
+                        <p>Verification date: {{ profile.verification_date|date:"F d, Y" }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4>Benefits of Verification</h4>
+                        <ul class="benefits-list">
+                            <li>Higher trust score and visibility in search results</li>
+                            <li>Access to premium projects with higher budgets</li>
+                            <li>Increased withdrawal limits and lower fees</li>
+                            <li>Priority customer support</li>
+                        </ul>
+                    </div>
+                    
+                    {% elif profile.verification_status == 'pending' %}
+                    <div class="verification-status pending">
+                        <div class="badge-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>Pending Review</h3>
+                        <p>Your verification documents are under review.</p>
+                        <p>Submission date: {{ profile.verification_submission_date|date:"F d, Y" }}</p>
+                        <p>Please allow 1-3 business days for the review process to complete.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4>What Happens Next?</h4>
+                        <p>Our verification team will review your submitted documents. You will receive an email notification once the review is complete.</p>
+                        <p>In the meantime, you can continue using the platform with limited features.</p>
+                    </div>
+                    
+                    {% elif profile.verification_status == 'rejected' %}
+                    <div class="verification-status rejected">
+                        <div class="badge-icon">
+                            <i class="fas fa-times"></i>
+                        </div>
+                        <h3>Verification Rejected</h3>
+                        <p>Unfortunately, your verification submission was rejected.</p>
+                        <p>Reason: {{ profile.verification_rejection_reason }}</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4>Next Steps</h4>
+                        <p>Please address the issues mentioned above and resubmit your verification documents.</p>
+                        <div class="text-center mt-4">
+                            <a href="{% url 'submit-verification' %}" class="action-btn">
+                                <i class="fas fa-redo me-2"></i>Resubmit Verification
+                            </a>
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <div class="verification-status not-verified">
+                        <div class="badge-icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>Not Verified</h3>
+                        <p>Your account is not verified. Verification helps build trust and unlocks premium features.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4>Why Verify Your Account?</h4>
+                        <ul class="benefits-list">
+                            <li>Build trust with clients and increase job opportunities</li>
+                            <li>Access exclusive high-budget projects</li>
+                            <li>Enjoy higher withdrawal limits and lower transaction fees</li>
+                            <li>Receive a verification badge on your profile</li>
+                        </ul>
+                        <div class="text-center mt-4">
+                            <a href="{% url 'submit-verification' %}" class="action-btn">
+                                <i class="fas fa-id-card me-2"></i>Start Verification Process
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Trust Score Card -->
+                <div class="verification-card trust-score-card">
+                    <h2 class="verification-title">Trust Score</h2>
+                    
+                    <div class="trust-score-value">
+                        <span>{{ profile.trust_score }}</span>
+                        <span class="text-muted">/100</span>
+                    </div>
+                    
+                    <div class="trust-score-meter trust-score-{% if profile.trust_score < 30 %}low{% elif profile.trust_score < 70 %}medium{% else %}high{% endif %}">
+                        <div class="trust-score-fill" style="width: {{ profile.trust_score }}%"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between text-muted mb-4">
+                        <span>Low</span>
+                        <span>Medium</span>
+                        <span>High</span>
+                    </div>
+                    
+                    <h4>How to improve your trust score:</h4>
+                    <div class="trust-score-steps">
+                        <div class="trust-step {% if profile.verification_status == 'verified' %}completed{% else %}incomplete{% endif %}">
+                            <i class="fas {% if profile.verification_status == 'verified' %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                            <span>Complete the verification process</span>
+                        </div>
+                        
+                        <div class="trust-step {% if profile.bio %}completed{% else %}incomplete{% endif %}">
+                            <i class="fas {% if profile.bio %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                            <span>Add detailed profile information</span>
+                        </div>
+                        
+                        <div class="trust-step {% if profile.social_github or profile.social_twitter or profile.social_linkedin %}completed{% else %}incomplete{% endif %}">
+                            <i class="fas {% if profile.social_github or profile.social_twitter or profile.social_linkedin %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                            <span>Connect social accounts</span>
+                        </div>
+                        
+                        <div class="trust-step {% if profile.payment_method %}completed{% else %}incomplete{% endif %}">
+                            <i class="fas {% if profile.payment_method %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                            <span>Add payment information</span>
+                        </div>
+                        
+                        <div class="trust-step {% if profile.client_reviews_count > 0 or profile.freelancer_review_count > 0 %}completed{% else %}incomplete{% endif %}">
+                            <i class="fas {% if profile.client_reviews_count > 0 or profile.freelancer_review_count > 0 %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+                            <span>Get positive reviews</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'payment-info' %}" class="action-btn">
+                            <i class="fas fa-credit-card me-2"></i>Add Payment Information
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

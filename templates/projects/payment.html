@@ -1,0 +1,179 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Payment - {{ milestone.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-header {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .payment-amount {
+        font-size: 1.75rem;
+        font-weight: bold;
+        color: #212529;
+    }
+    .payment-info {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .payment-method {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .payment-method.selected {
+        border-color: #28a745;
+        background-color: rgba(40, 167, 69, 0.05);
+    }
+    .method-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .method-logo {
+        margin-right: 15px;
+    }
+    .method-title {
+        font-size: 1.2rem;
+        margin-bottom: 0;
+    }
+    .confirmation-details {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid #dee2e6;
+        margin-top: 10px;
+        padding-top: 10px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'jobs' %}">Jobs</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'job' pk=milestone.job.id %}">{{ milestone.job.title }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Payment</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="payment-header text-center">
+                <h1 class="mb-3">Fund Milestone: {{ milestone.title }}</h1>
+                <div class="payment-amount mb-2">${{ milestone.amount }}</div>
+                <p class="text-muted">Secure payment for {{ milestone.job.title }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-info">
+        <div class="row">
+            <div class="col-lg-8">
+                <h3 class="mb-4">Payment Method</h3>
+                
+                <div class="payment-method selected">
+                    <div class="method-header">
+                        <div class="method-logo">
+                            <img src="{% static 'images/stripe-logo.png' %}" alt="Stripe" height="30">
+                        </div>
+                        <div>
+                            <h5 class="method-title">Credit or Debit Card</h5>
+                            <small class="text-muted">Fast, secure payment processed by Stripe</small>
+                        </div>
+                    </div>
+                    
+                    <div class="stripe-info">
+                        <p>You'll be redirected to Stripe's secure payment page to complete your transaction.</p>
+                        
+                        <form action="{% url 'create-checkout-session' milestone_id=milestone.id %}" method="POST" id="payment-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg w-100" id="checkout-button">
+                                Proceed to Payment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Secure Escrow Payment</h5>
+                            <p class="mb-0">
+                                Your payment will be held in escrow until you approve the milestone. This protects you as a client while ensuring the freelancer can work with confidence. You'll have the opportunity to review the work before the funds are released.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payment Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="confirmation-details">
+                            <div class="detail-row">
+                                <span>Milestone:</span>
+                                <span>{{ milestone.title }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Job:</span>
+                                <span>{{ milestone.job.title }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Freelancer:</span>
+                                <span>{{ milestone.job.freelancer.name }}</span>
+                            </div>
+                            {% if milestone.due_date %}
+                            <div class="detail-row">
+                                <span>Due Date:</span>
+                                <span>{{ milestone.due_date|date:"M d, Y" }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="total-row">
+                                <span>Total:</span>
+                                <span>${{ milestone.amount }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6>What Happens Next?</h6>
+                            <ol class="small">
+                                <li>Your payment will be securely held in escrow</li>
+                                <li>The freelancer will complete the milestone</li>
+                                <li>You'll review the work and approve the payment</li>
+                                <li>Funds will be released to the freelancer</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

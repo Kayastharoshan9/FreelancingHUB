@@ -1,0 +1,231 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}
+    {% if project %}
+        Edit Project
+    {% else %}
+        Add Project
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .form-section {
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    .form-section h4 {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+    }
+    .project-tips {
+        background-color: #e9f7ef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+    .tip-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+    .tip-icon {
+        margin-right: 10px;
+        color: #27ae60;
+    }
+    .tags-container {
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+    }
+    .tags-container .form-check {
+        margin-bottom: 8px;
+    }
+    .help-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    .form-section-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .form-section-title i {
+        margin-right: 10px;
+        color: #4a6cf7;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-container">
+        <h1 class="mb-4">
+            {% if project %}
+                Edit Project
+            {% else %}
+                Add Project to Your Portfolio
+            {% endif %}
+        </h1>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-info-circle fa-lg"></i>
+                    <h4 class="mb-0">Basic Information</h4>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Project Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Project Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small">{{ form.description.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Describe the project, your role, challenges faced, and solutions implemented.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.price.id_for_label }}" class="form-label">Project Value/Price (USD)</label>
+                    {{ form.price }}
+                    {% if form.price.errors %}
+                        <div class="text-danger small">{{ form.price.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">{{ form.price.help_text }}</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-link fa-lg"></i>
+                    <h4 class="mb-0">Project Links</h4>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.demo_link.id_for_label }}" class="form-label">Demo Link</label>
+                        {{ form.demo_link }}
+                        {% if form.demo_link.errors %}
+                            <div class="text-danger small">{{ form.demo_link.errors }}</div>
+                        {% endif %}
+                        <div class="help-text">URL to a live demo of your project, if available.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.source_link.id_for_label }}" class="form-label">Source Code</label>
+                        {{ form.source_link }}
+                        {% if form.source_link.errors %}
+                            <div class="text-danger small">{{ form.source_link.errors }}</div>
+                        {% endif %}
+                        <div class="help-text">Link to the project's GitHub repository or other source code.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-image fa-lg"></i>
+                    <h4 class="mb-0">Project Image</h4>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image</label>
+                    {{ form.featured_image }}
+                    {% if form.featured_image.errors %}
+                        <div class="text-danger small">{{ form.featured_image.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Upload a screenshot or image that showcases your project.</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="form-section-title">
+                    <i class="fas fa-tags fa-lg"></i>
+                    <h4 class="mb-0">Project Tags</h4>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Existing Tags</label>
+                    <div class="tags-container">
+                        {{ form.tags }}
+                    </div>
+                    {% if form.tags.errors %}
+                        <div class="text-danger small">{{ form.tags.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Select all existing tags that apply to this project.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.new_tags.id_for_label }}" class="form-label">Add New Tags</label>
+                    {{ form.new_tags }}
+                    {% if form.new_tags.errors %}
+                        <div class="text-danger small">{{ form.new_tags.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">{{ form.new_tags.help_text }}</div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'account' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        {% if project %}
+                            Update Project
+                        {% else %}
+                            Add Project
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+        
+        <div class="project-tips">
+            <h5><i class="fas fa-lightbulb me-2"></i>Tips for Showcasing Your Work</h5>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Choose a high-quality image that clearly shows your project.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Be specific about your role and contributions to the project.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Highlight technical challenges and how you solved them.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Include measurable results or impacts of your work when possible.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Use relevant tags to help clients find your work.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

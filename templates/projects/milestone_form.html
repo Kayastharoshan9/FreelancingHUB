@@ -1,0 +1,170 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}
+    {% if milestone %}
+        Edit Milestone
+    {% else %}
+        Create Milestone
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .job-summary {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .job-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    .meta-item {
+        margin-right: 20px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .meta-item i {
+        margin-right: 5px;
+        color: #6c757d;
+    }
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .milestone-tips {
+        background-color: #e9f7ef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .tip-item {
+        margin-bottom: 10px;
+        display: flex;
+    }
+    .tip-icon {
+        margin-right: 10px;
+        color: #27ae60;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="form-container">
+        <h1 class="mb-4">
+            {% if milestone %}
+                Edit Milestone
+            {% else %}
+                Create Milestone
+            {% endif %}
+        </h1>
+        
+        <div class="job-summary">
+            <div class="job-title">{{ job.title }}</div>
+            <div class="job-meta">
+                <div class="meta-item">
+                    <i class="fas fa-user"></i>
+                    <span>Client: {{ job.client.name }}</span>
+                </div>
+                {% if job.freelancer %}
+                <div class="meta-item">
+                    <i class="fas fa-user-tie"></i>
+                    <span>Freelancer: {{ job.freelancer.name }}</span>
+                </div>
+                {% endif %}
+                <div class="meta-item">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>${{ job.budget_min }} - ${{ job.budget_max }}{% if job.job_type == 'hourly' %}/hr{% endif %}</span>
+                </div>
+            </div>
+            <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-eye me-2"></i>View Full Job
+            </a>
+        </div>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label">Milestone Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="text-danger small">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="text-danger small">{{ form.description.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="{{ form.amount.id_for_label }}" class="form-label">Amount ($)</label>
+                    {{ form.amount }}
+                    {% if form.amount.help_text %}
+                        <div class="form-text">{{ form.amount.help_text }}</div>
+                    {% endif %}
+                    {% if form.amount.errors %}
+                        <div class="text-danger small">{{ form.amount.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>
+                    {{ form.due_date }}
+                    {% if form.due_date.errors %}
+                        <div class="text-danger small">{{ form.due_date.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>
+                    {% if milestone %}
+                        Update Milestone
+                    {% else %}
+                        Create Milestone
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+        
+        <div class="milestone-tips">
+            <h5><i class="fas fa-lightbulb me-2"></i>Tips for Effective Milestones</h5>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Break down the project into clear, manageable chunks.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Set realistic deadlines that allow for quality work.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Clearly define what deliverables are expected for each milestone.</div>
+            </div>
+            <div class="tip-item">
+                <div class="tip-icon"><i class="fas fa-check"></i></div>
+                <div>Align payment amounts with the value and effort of each milestone.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

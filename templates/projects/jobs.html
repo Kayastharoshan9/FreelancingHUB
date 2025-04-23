@@ -1,0 +1,326 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Find Jobs{% endblock %}
+
+{% block extra_css %}
+<style>
+    .search-bar {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .job-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .job-header {
+        padding: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    .job-body {
+        padding: 20px;
+    }
+    .job-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+    .job-title a {
+        color: #333;
+        text-decoration: none;
+    }
+    .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .meta-item {
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .meta-item i {
+        margin-right: 5px;
+    }
+    .skill-tag {
+        background-color: #e9ecef;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    .filters {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .filter-section {
+        margin-bottom: 20px;
+    }
+    .filter-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    .empty-icon {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12 mb-4">
+            <h1 class="mb-4">Find Jobs</h1>
+            
+            <div class="search-bar">
+                <form method="GET" action="{% url 'jobs' %}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for jobs..." name="q" value="{{ request.GET.q }}">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" name="job_type">
+                                <option value="">All Types</option>
+                                <option value="fixed" {% if request.GET.job_type == 'fixed' %}selected{% endif %}>Fixed Price</option>
+                                <option value="hourly" {% if request.GET.job_type == 'hourly' %}selected{% endif %}>Hourly Rate</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" placeholder="Min Budget" name="min_budget" value="{{ request.GET.min_budget }}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" placeholder="Max Budget" name="max_budget" value="{{ request.GET.max_budget }}">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="filters">
+                <h5 class="mb-3">Filters</h5>
+                
+                <div class="filter-section">
+                    <div class="filter-title">Job Type</div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-checkbox" type="checkbox" value="fixed" id="fixedPriceFilter" {% if request.GET.job_type == 'fixed' %}checked{% endif %}>
+                        <label class="form-check-label" for="fixedPriceFilter">
+                            Fixed Price
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input filter-checkbox" type="checkbox" value="hourly" id="hourlyRateFilter" {% if request.GET.job_type == 'hourly' %}checked{% endif %}>
+                        <label class="form-check-label" for="hourlyRateFilter">
+                            Hourly Rate
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-title">Budget Range</div>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Min $" id="minBudgetFilter" value="{{ request.GET.min_budget }}">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control form-control-sm" placeholder="Max $" id="maxBudgetFilter" value="{{ request.GET.max_budget }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-sm w-100 mt-3" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+            
+            {% if request.user.is_authenticated %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Post a Job</h5>
+                </div>
+                <div class="card-body">
+                    <p>Looking to hire a freelancer for your project?</p>
+                    <a href="{% url 'create-job' %}" class="btn btn-success w-100">
+                        <i class="fas fa-plus-circle me-2"></i>Post a Job
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Available Jobs ({{ jobs|length }})</h4>
+                <div>
+                    <span class="text-muted">Sort by:</span>
+                    <select class="form-select form-select-sm d-inline-block ms-2" style="width: auto;">
+                        <option selected>Newest First</option>
+                        <option>Budget: High to Low</option>
+                        <option>Budget: Low to High</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if jobs %}
+                {% for job in jobs %}
+                <div class="job-card">
+                    <div class="job-header">
+                        <h3 class="job-title">
+                            <a href="{% url 'job' pk=job.id %}">{{ job.title }}</a>
+                        </h3>
+                        <div class="job-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ job.client.name }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Posted {{ job.created|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ job.location|default:"Remote" }}</span>
+                            </div>
+                        </div>
+                        <div class="job-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>
+                                    ${{ job.budget_min }} - ${{ job.budget_max }}
+                                    {% if job.job_type == 'hourly' %}/hr{% endif %}
+                                </span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                <span>
+                                    {% if job.job_type == 'fixed' %}
+                                        Fixed Price
+                                    {% else %}
+                                        Hourly Rate
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% if job.deadline %}
+                            <div class="meta-item">
+                                <i class="fas fa-hourglass-end"></i>
+                                <span>Deadline: {{ job.deadline|date:"M d, Y" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="job-body">
+                        <p>{{ job.description|truncatewords:30 }}</p>
+                        
+                        <div class="mb-3">
+                            {% for skill in job.required_skills.all %}
+                                <span class="skill-tag">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'job' pk=job.id %}" class="btn btn-outline-primary btn-sm">
+                                View Details
+                            </a>
+                            <span class="text-muted small">
+                                {{ job.bids.count }} proposals
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>No jobs found</h3>
+                    <p class="text-muted">Try adjusting your search criteria or check back later for new opportunities.</p>
+                    
+                    {% if request.GET.q or request.GET.job_type or request.GET.min_budget or request.GET.max_budget %}
+                        <a href="{% url 'jobs' %}" class="btn btn-outline-primary mt-3">
+                            <i class="fas fa-times me-2"></i>Clear Filters
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply filters button
+        document.getElementById('applyFiltersBtn').addEventListener('click', function() {
+            let url = new URL(window.location.href);
+            let params = new URLSearchParams(url.search);
+            
+            // Get current search query if exists
+            let currentQuery = params.get('q');
+            if (currentQuery) {
+                params.set('q', currentQuery);
+            } else {
+                params.delete('q');
+            }
+            
+            // Job type
+            let jobTypeChecked = [];
+            document.querySelectorAll('.filter-checkbox:checked').forEach(function(checkbox) {
+                jobTypeChecked.push(checkbox.value);
+            });
+            
+            if (jobTypeChecked.length === 1) {
+                params.set('job_type', jobTypeChecked[0]);
+            } else {
+                params.delete('job_type');
+            }
+            
+            // Budget range
+            let minBudget = document.getElementById('minBudgetFilter').value;
+            let maxBudget = document.getElementById('maxBudgetFilter').value;
+            
+            if (minBudget) {
+                params.set('min_budget', minBudget);
+            } else {
+                params.delete('min_budget');
+            }
+            
+            if (maxBudget) {
+                params.set('max_budget', maxBudget);
+            } else {
+                params.delete('max_budget');
+            }
+            
+            // Redirect with filters
+            window.location.href = url.pathname + '?' + params.toString();
+        });
+    });
+</script>
+{% endblock %}

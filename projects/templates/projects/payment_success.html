@@ -1,0 +1,16 @@
+{% extends "main.html" %}
+
+{% block content %}
+<main class="container py-5">
+    <div class="card">
+        <div class="card-body text-center">
+            <h2 class="card-title text-success">Payment Successful!</h2>
+            <p class="card-text">Your payment for milestone #{{ milestone_id }} has been processed successfully.</p>
+            <p class="card-text">The funds are now held in escrow and will be released to the freelancer upon completion and your approval of the milestone.</p>
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">Return to Dashboard</a>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

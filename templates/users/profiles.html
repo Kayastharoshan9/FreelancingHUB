@@ -1,0 +1,500 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Browse Freelancers | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@7/swiper-bundle.min.css" />
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-section p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.9;
+    }
+    
+    .recommended-section {
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+    }
+    
+    .recommended-section .section-title {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.8rem;
+        position: relative;
+        font-size: 1.8rem;
+    }
+    
+    .recommended-section .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: #6a11cb;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    
+    .profile-header {
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .profile-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-name {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+    
+    .profile-title {
+        color: #6c757d;
+        margin-bottom: 10px;
+    }
+    
+    .profile-body {
+        padding: 20px;
+    }
+    
+    .profile-skills {
+        margin-top: 15px;
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 5px 10px;
+        margin: 0 5px 5px 0;
+        border-radius: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .profile-footer {
+        border-top: 1px solid #eee;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .rating {
+        display: flex;
+        align-items: center;
+    }
+    
+    .rating-stars {
+        color: #ffc107;
+        margin-right: 5px;
+    }
+    
+    .hourly-rate {
+        font-weight: 600;
+        color: #28a745;
+    }
+    
+    .btn-view-profile {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-view-profile:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(42, 17, 203, 0.2);
+    }
+    
+    .verified-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: #28a745;
+        color: white;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 20px;
+        margin-left: 5px;
+    }
+    
+    .verified-badge i {
+        margin-right: 3px;
+    }
+    
+    /* Swiper styles for the recommended section */
+    .swiper {
+        width: 100%;
+        padding: 20px 0;
+    }
+    
+    .swiper-slide {
+        height: auto;
+    }
+    
+    .swiper-button-next, 
+    .swiper-button-prev {
+        color: #6a11cb;
+    }
+    
+    .swiper-pagination-bullet-active {
+        background: #6a11cb;
+    }
+    
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 3rem 0;
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+        
+        .profile-img {
+            width: 80px;
+            height: 80px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1>Find Your Perfect Freelancer</h1>
+        <p>Browse our talented community of professionals with verified skills and experience. From web development to design, we've got you covered.</p>
+    </div>
+</section>
+
+<!-- Recommended Freelancers Section -->
+{% if recommended_freelancers %}
+<section class="recommended-section">
+    <div class="container">
+        <h2 class="section-title">Recommended Freelancers</h2>
+        <p class="text-muted mb-4">Tailored suggestions based on your project needs and AI matching.</p>
+        
+        <div class="swiper recommended-swiper">
+            <div class="swiper-wrapper">
+                {% for profile in recommended_freelancers %}
+                <div class="swiper-slide">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <img src="{{ profile.imageURL }}" alt="{{ profile.name }}" class="profile-img">
+                            <div class="profile-name">
+                                {{ profile.name }}
+                                {% if profile.is_verified %}
+                                <span class="verified-badge">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="profile-title">{{ profile.short_intro|truncatechars:60 }}</div>
+                        </div>
+                        
+                        <div class="profile-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div class="rating">
+                                    <div class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        {{ profile.freelancer_rating|floatformat:1 }}
+                                    </div>
+                                    <span class="text-muted">({{ profile.freelancer_reviews_count }} reviews)</span>
+                                </div>
+                                
+                                {% if profile.hourly_rate %}
+                                <div class="hourly-rate">${{ profile.hourly_rate }}/hr</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="profile-skills">
+                                {% for skill in profile.skill_set.all|slice:":4" %}
+                                <span class="skill-tag">{{ skill.name }}</span>
+                                {% empty %}
+                                <span class="text-muted">No skills listed</span>
+                                {% endfor %}
+                                {% if profile.skill_set.count > 4 %}
+                                <span class="skill-tag">+{{ profile.skill_set.count|add:"-4" }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="profile-footer">
+                            <div class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ profile.location|default:"Remote" }}
+                            </div>
+                            <a href="{% url 'profile' profile.id %}" class="btn-view-profile">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+{% elif user.is_authenticated and user.is_staff %}
+<!-- Admin notice for missing OpenAI API key -->
+<div class="container my-4">
+    <div class="alert alert-warning">
+        <h4><i class="fas fa-exclamation-triangle"></i> AI Recommendations Disabled</h4>
+        <p>The AI recommendation system is not showing freelancers because the OpenAI API key is not configured.</p>
+        <p><strong>To enable recommendations:</strong></p>
+        <ol>
+            <li>Set the <code>OPENAI_API_KEY</code> environment variable, or</li>
+            <li>Add your API key to <code>config/env.py</code> file</li>
+        </ol>
+        <p>After adding the API key, restart the server for changes to take effect.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Main Freelancers Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Filters Column -->
+            <div class="col-md-3">
+                <div class="filter-card">
+                    <h4 class="mb-4">Filter Freelancers</h4>
+                    <form method="GET" action="{% url 'profiles' %}">
+                        <!-- Search field -->
+                        <div class="mb-3">
+                            <label for="search_query" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="search_query" name="search_query" placeholder="Search freelancers..." value="{{ search_query }}">
+                        </div>
+                        
+                        <!-- Rate range -->
+                        <div class="mb-3">
+                            <label class="form-label">Hourly Rate (USD)</label>
+                            <div class="row">
+                                <div class="col">
+                                    <input type="number" class="form-control" placeholder="Min" name="min_rate" value="{{ min_rate }}">
+                                </div>
+                                <div class="col">
+                                    <input type="number" class="form-control" placeholder="Max" name="max_rate" value="{{ max_rate }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Min rating -->
+                        <div class="mb-3">
+                            <label for="min_rating" class="form-label">Minimum Rating</label>
+                            <select class="form-select" id="min_rating" name="min_rating">
+                                <option value="">Any Rating</option>
+                                <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>4.5+</option>
+                                <option value="4" {% if min_rating == '4' %}selected{% endif %}>4.0+</option>
+                                <option value="3.5" {% if min_rating == '3.5' %}selected{% endif %}>3.5+</option>
+                                <option value="3" {% if min_rating == '3' %}selected{% endif %}>3.0+</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Location -->
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="Any location" value="{{ location }}">
+                        </div>
+                        
+                        <!-- Skills filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Skills</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="skills" value="python" id="skill_python" {% if 'python' in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill_python">Python</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="skills" value="javascript" id="skill_javascript" {% if 'javascript' in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill_javascript">JavaScript</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="skills" value="html" id="skill_html" {% if 'html' in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill_html">HTML/CSS</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="skills" value="design" id="skill_design" {% if 'design' in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill_design">Design</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="skills" value="marketing" id="skill_marketing" {% if 'marketing' in selected_skills %}checked{% endif %}>
+                                <label class="form-check-label" for="skill_marketing">Marketing</label>
+                            </div>
+                        </div>
+                        
+                        <!-- Sort options -->
+                        <div class="mb-4">
+                            <label for="sort" class="form-label">Sort By</label>
+                            <select class="form-select" id="sort" name="sort">
+                                <option value="" {% if sort == '' %}selected{% endif %}>Newest</option>
+                                <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Highest Rating</option>
+                                <option value="hourly_rate_low" {% if sort == 'hourly_rate_low' %}selected{% endif %}>Hourly Rate (Low to High)</option>
+                                <option value="hourly_rate_high" {% if sort == 'hourly_rate_high' %}selected{% endif %}>Hourly Rate (High to Low)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Profiles Column -->
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>All Freelancers</h2>
+                    <span class="text-muted">{{ profiles.paginator.count }} freelancers found</span>
+                </div>
+                
+                <div class="row">
+                    {% for profile in profiles %}
+                    <div class="col-md-4 mb-4">
+                        <div class="profile-card h-100">
+                            <div class="profile-header">
+                                <img src="{{ profile.imageURL }}" alt="{{ profile.name }}" class="profile-img">
+                                <div class="profile-name">
+                                    {{ profile.name }}
+                                    {% if profile.is_verified %}
+                                    <span class="verified-badge">
+                                        <i class="fas fa-check-circle"></i> Verified
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <div class="profile-title">{{ profile.short_intro|truncatechars:60 }}</div>
+                            </div>
+                            
+                            <div class="profile-body">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div class="rating">
+                                        <div class="rating-stars">
+                                            <i class="fas fa-star"></i>
+                                            {{ profile.freelancer_rating|floatformat:1 }}
+                                        </div>
+                                        <span class="text-muted">({{ profile.freelancer_reviews_count }} reviews)</span>
+                                    </div>
+                                    
+                                    {% if profile.hourly_rate %}
+                                    <div class="hourly-rate">${{ profile.hourly_rate }}/hr</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="profile-skills">
+                                    {% for skill in profile.skill_set.all|slice:":4" %}
+                                    <span class="skill-tag">{{ skill.name }}</span>
+                                    {% empty %}
+                                    <span class="text-muted">No skills listed</span>
+                                    {% endfor %}
+                                    {% if profile.skill_set.count > 4 %}
+                                    <span class="skill-tag">+{{ profile.skill_set.count|add:"-4" }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="profile-footer">
+                                <div class="text-muted">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ profile.location|default:"Remote" }}
+                                </div>
+                                <a href="{% url 'profile' profile.id %}" class="btn-view-profile">View Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No freelancers match your search criteria. Try adjusting your filters.
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% include 'pagination.html' with queryset=profiles custom_range=custom_range %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@7/swiper-bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the swiper for recommended freelancers
+        new Swiper('.recommended-swiper', {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20,
+                },
+                992: {
+                    slidesPerView: 3,
+                    spaceBetween: 30,
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

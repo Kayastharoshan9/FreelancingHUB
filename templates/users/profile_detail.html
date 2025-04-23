@@ -1,0 +1,1247 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}{{ profile.name }} | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Detail Custom Styles */
+    .profile-header {
+        background: linear-gradient(135deg, #4a00e0, #8e2de2);
+        color: white;
+        padding: 60px 0 100px;
+        margin-bottom: 10px;
+        position: relative;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+        height: auto;
+        display: block;
+        overflow: hidden;
+    }
+    
+    /* Add margin to top profile card */
+    .container > .profile-card:first-child {
+        margin-top: 80px;
+    }
+    
+    .profile-info {
+        display: flex;
+        margin-bottom: 30px;
+    }
+    
+    .profile-avatar {
+        flex: 0 0 150px;
+        margin-right: 30px;
+    }
+    
+    .profile-avatar img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .profile-details {
+        flex: 1;
+    }
+    
+    .profile-name {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .profile-title {
+        font-size: 16px;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+    
+    .profile-meta {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+    
+    .profile-meta-item {
+        margin-right: 20px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .profile-meta-item i {
+        margin-right: 5px;
+        color: var(--color-main);
+    }
+    
+    .profile-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .verification-badge {
+        display: inline-flex;
+        align-items: center;
+        background: #e3f7ee;
+        color: #28a745;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-left: 10px;
+    }
+    
+    .verification-badge i {
+        margin-right: 5px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--color-main);
+    }
+    
+    .skill-tag {
+        display: inline-block;
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 8px 16px;
+        margin-right: 0;
+        margin-bottom: 0;
+        font-size: 14px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+    
+    .skill-tag:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+    
+    .skill-tag.featured {
+        background: #e3f2fd;
+        border-color: #bbdefb;
+        font-weight: 500;
+    }
+    
+    .project-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+        margin-bottom: 20px;
+        border: none;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .project-card img {
+        height: 180px;
+        object-fit: cover;
+    }
+    
+    .project-card .card-body {
+        padding: 20px;
+    }
+    
+    .rating-stars {
+        color: #ffc107;
+        margin-bottom: 15px;
+    }
+    
+    .review-card {
+        border-left: 3px solid var(--color-main);
+        padding: 15px;
+        margin-bottom: 20px;
+        background: #f8f9fa;
+        border-radius: 0 5px 5px 0;
+    }
+    
+    .review-content {
+        font-style: italic;
+        margin-bottom: 10px;
+    }
+    
+    .review-author {
+        display: flex;
+        align-items: center;
+    }
+    
+    .review-author img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+    
+    .trust-score {
+        background: #e9ecef;
+        height: 10px;
+        border-radius: 5px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+    
+    .trust-score-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+    }
+    
+    /* Trust score levels */
+    .trust-score-low .trust-score-fill {
+        background: linear-gradient(90deg, #dc3545, #fd7e14);
+        width: 30%;
+    }
+    
+    .trust-score-medium .trust-score-fill {
+        background: linear-gradient(90deg, #fd7e14, #ffc107);
+        width: 60%;
+    }
+    
+    .trust-score-high .trust-score-fill {
+        background: linear-gradient(90deg, #28a745, #20c997);
+        width: 90%;
+    }
+    
+    .dual-rating {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .rating-box {
+        flex: 0 0 48%;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .rating-box.client {
+        background: #e3f7ee;
+    }
+    
+    .rating-box.freelancer {
+        background: #e3f2fd;
+    }
+    
+    .rating-box h4 {
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+    
+    .rating-value {
+        font-size: 24px;
+        font-weight: 700;
+    }
+    
+    .rating-count {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    /* Badge styles */
+    .badges-section {
+        margin-bottom: 20px;
+    }
+    
+    .badge-card {
+        border-radius: 10px;
+        background: #f8f9fa;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-left: 3px solid #4a6cf7;
+        display: flex;
+        align-items: center;
+    }
+    
+    .badge-icon {
+        width: 40px;
+        height: 40px;
+        background: #4a6cf7;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-right: 15px;
+    }
+    
+    .badge-info {
+        flex: 1;
+    }
+    
+    .badge-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .badge-description {
+        font-size: 14px;
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    /* Ensure adequate margin at the bottom of the page to prevent footer overlap */
+    .profile-page {
+        padding-bottom: 200px;
+        margin-bottom: 80px;
+        min-height: calc(100vh - 400px);
+        position: relative;
+        z-index: 1;
+    }
+    
+    @media (max-width: 767px) {
+        .profile-info {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            margin-right: 0;
+            margin-bottom: 20px;
+        }
+        
+        .profile-meta {
+            justify-content: center;
+        }
+        
+        .profile-actions {
+            justify-content: center;
+        }
+        
+        .section-title:after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .dual-rating {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+    
+    /* Skills & Expertise section improvements */
+    .skills-section {
+        margin-bottom: 30px;
+    }
+    
+    .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        max-height: none;
+    }
+    
+    .col-lg-8 .profile-card {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .col-lg-4 .profile-card {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    /* ULTRA SIMPLE CUSTOM MODAL - NO BOOTSTRAP */
+    /* ------------------------------------- */
+    .simple-modal {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        overflow: auto;
+        padding-top: 100px;
+    }
+    
+    .simple-modal-content {
+        background-color: white;
+        margin: auto;
+        padding: 20px;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+    
+    .simple-modal-close {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    
+    .simple-modal-header {
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 15px;
+    }
+    
+    .simple-modal-header h3 {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .simple-modal-body {
+        margin-bottom: 15px;
+    }
+    
+    .simple-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+    
+    /* Simple form styles */
+    .rating-select {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+    }
+    
+    .rating-option {
+        display: inline-block;
+        cursor: pointer;
+    }
+    
+    .rating-option input {
+        margin-right: 5px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+    
+    .form-control {
+        display: block;
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    
+    .btn-primary {
+        background-color: #4a6cf7;
+        color: white;
+    }
+    
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    /* Other existing styles */
+    .payment-methods .list-group-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .payment-qr-code {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        background: #fff;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Main Section -->
+<main class="profile-page">
+    <div class="profile-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'profiles' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> Back to Freelancers
+                </a>
+                
+                {% if request.user.is_authenticated and request.user.profile.id != profile.id %}
+                <a href="{% url 'create-message' profile.id %}" class="btn btn-light">
+                    <i class="fas fa-envelope"></i> Send Message
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <img src="{{ profile.imageURL }}" alt="{{ profile.name }}">
+                </div>
+                
+                <div class="profile-details">
+                    <h1 class="profile-name">
+                        {{ profile.name }}
+                        {% if profile.verification_status == 'verified' %}
+                        <span class="verification-badge">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </span>
+                        {% endif %}
+                    </h1>
+                    
+                    <p class="profile-title">{{ profile.short_intro }}</p>
+                    
+                    <div class="profile-meta">
+                        <div class="profile-meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ profile.location }}</span>
+                        </div>
+                        
+                        {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+                        <div class="profile-meta-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>${{ profile.hourly_rate|default:"0" }}/hr</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="profile-meta-item">
+                            <i class="fas fa-user-clock"></i>
+                            <span>Member since {{ profile.created|date:"M Y" }}</span>
+                        </div>
+                        
+                        {% if profile.social_github %}
+                        <div class="profile-meta-item">
+                            <i class="fab fa-github"></i>
+                            <a href="{{ profile.social_github }}" target="_blank" class="text-decoration-none">
+                                GitHub
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.social_twitter %}
+                        <div class="profile-meta-item">
+                            <i class="fab fa-twitter"></i>
+                            <a href="{{ profile.social_twitter }}" target="_blank" class="text-decoration-none">
+                                Twitter
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.social_linkedin %}
+                        <div class="profile-meta-item">
+                            <i class="fab fa-linkedin"></i>
+                            <a href="{{ profile.social_linkedin }}" target="_blank" class="text-decoration-none">
+                                LinkedIn
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if profile.social_website %}
+                        <div class="profile-meta-item">
+                            <i class="fas fa-globe"></i>
+                            <a href="{{ profile.social_website }}" target="_blank" class="text-decoration-none">
+                                Website
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="profile-actions">
+                        {% if request.user.is_authenticated and request.user.profile.id != profile.id %}
+                        <a href="{% url 'create-message' profile.id %}" class="btn btn-primary">
+                            <i class="fas fa-envelope"></i> Contact Me
+                        </a>
+                        
+                        {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+                        <a href="{% url 'create-job' %}?freelancer_id={{ profile.id }}" class="btn btn-outline-primary">
+                            <i class="fas fa-briefcase"></i> Hire Me
+                        </a>
+                        {% endif %}
+                        
+                        {% if request.user.is_authenticated and request.user.profile.user_type == 'client' and profile.user_type == 'freelancer' %}
+                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#rateFreelancerModal">
+                            <i class="fas fa-star"></i> Rate Freelancer
+                        </button>
+                        {% endif %}
+                        
+                        {% if request.user.is_authenticated and request.user.profile.user_type == 'freelancer' and profile.user_type == 'client' %}
+                        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#rateClientModal">
+                            <i class="fas fa-star"></i> Rate Client
+                        </button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dual Rating System -->
+            {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+            <div class="dual-rating">
+                <div class="rating-box client">
+                    <h4>Client Rating</h4>
+                    <div class="rating-stars">
+                        <i class="fas fa-star{% if profile.client_rating < 1 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.client_rating < 2 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.client_rating < 3 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.client_rating < 4 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.client_rating < 5 %}-half{% endif %}"></i>
+                    </div>
+                    <div class="rating-value">{{ profile.client_rating|floatformat:1 }}</div>
+                    <div class="rating-count">({{ profile.client_reviews_count|default:"0" }} reviews)</div>
+                </div>
+                
+                <div class="rating-box freelancer">
+                    <h4>Freelancer Rating</h4>
+                    <div class="rating-stars">
+                        <i class="fas fa-star{% if profile.freelancer_rating < 1 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.freelancer_rating < 2 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.freelancer_rating < 3 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.freelancer_rating < 4 %}-half{% endif %}"></i>
+                        <i class="fas fa-star{% if profile.freelancer_rating < 5 %}-half{% endif %}"></i>
+                    </div>
+                    <div class="rating-value">{{ profile.freelancer_rating|floatformat:1 }}</div>
+                    <div class="rating-count">({{ profile.freelancer_review_count|default:"0" }} reviews)</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Trust Score -->
+            <div class="mb-4">
+                <h3 class="section-title">Trust Score</h3>
+                <div class="trust-score trust-score-{% if profile.trust_level %}{{ profile.trust_level }}{% else %}medium{% endif %}">
+                    <div class="trust-score-fill"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <small>Low</small>
+                    <small>Medium</small>
+                    <small>High</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- About Section -->
+                <div class="profile-card">
+                    <h3 class="section-title">About Me</h3>
+                    <p>{{ profile.bio }}</p>
+                </div>
+                
+                <!-- Skills Section - Prominently displayed -->
+                {% if top_skills or other_skills %}
+                <div class="profile-card">
+                    <h3 class="section-title">Skills & Expertise</h3>
+                    
+                    {% if top_skills %}
+                    <div class="skills-section">
+                        <h4 class="mb-3 fs-5">Top Skills</h4>
+                        <div class="skills-container">
+                            {% for skill in top_skills %}
+                            <div class="skill-tag featured">
+                                {{ skill.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if other_skills %}
+                    <div class="skills-section">
+                        <h4 class="mb-3 fs-5">Other Skills</h4>
+                        <div class="skills-container">
+                            {% for skill in other_skills %}
+                            <div class="skill-tag">
+                                {{ skill.name }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Projects Section -->
+                {% if profile.project_set.all %}
+                <div class="profile-card">
+                    <h3 class="section-title">Portfolio</h3>
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for project in profile.project_set.all %}
+                        <div class="col">
+                            <div class="card project-card h-100">
+                                <img src="{{ project.imageURL }}" alt="{{ project.title }}" class="card-img-top">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ project.title }}</h5>
+                                    <p class="card-text">{{ project.description|truncatechars:100 }}</p>
+                                    <div class="d-flex flex-wrap mt-2">
+                                        {% for tag in project.tags.all %}
+                                        <span class="badge bg-light text-dark me-1 mb-1">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <a href="{% url 'project' project.id %}" class="btn btn-sm btn-outline-primary">View Project</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Reviews Section -->
+                {% if profile.freelancerreview_set.all %}
+                <div class="profile-card">
+                    <h3 class="section-title">Client Reviews</h3>
+                    {% for review in profile.freelancerreview_set.all|slice:":5" %}
+                    <div class="review-card">
+                        <div class="rating-stars mb-2">
+                            {% for i in "12345" %}
+                            <i class="fas fa-star{% if review.value < forloop.counter %}-half{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                        <p class="review-content">"{{ review.body }}"</p>
+                        <div class="review-author">
+                            <img src="{{ review.client.imageURL }}" alt="{{ review.client.name }}">
+                            <div>
+                                <h6 class="mb-0">{{ review.client.name }}</h6>
+                                <small class="text-muted">{{ review.created|date:"M d, Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if profile.freelancerreview_set.all.count > 5 %}
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#moreReviews" aria-expanded="false">
+                            Show More Reviews ({{ profile.freelancerreview_set.all.count|add:"-5" }})
+                        </button>
+                    </div>
+                    
+                    <div class="collapse mt-3" id="moreReviews">
+                        {% for review in profile.freelancerreview_set.all|slice:"5:" %}
+                        <div class="review-card">
+                            <div class="rating-stars mb-2">
+                                {% for i in "12345" %}
+                                <i class="fas fa-star{% if review.value < forloop.counter %}-half{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                            <p class="review-content">"{{ review.body }}"</p>
+                            <div class="review-author">
+                                <img src="{{ review.client.imageURL }}" alt="{{ review.client.name }}">
+                                <div>
+                                    <h6 class="mb-0">{{ review.client.name }}</h6>
+                                    <small class="text-muted">{{ review.created|date:"M d, Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Verification Status Card -->
+                <div class="profile-card">
+                    <h3 class="section-title">Verification Status</h3>
+                    <div class="list-group mb-3">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Email
+                            {% if profile.email_verified %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill"><i class="fas fa-times"></i></span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Phone
+                            {% if profile.phone_verified %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill"><i class="fas fa-times"></i></span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            ID Document
+                            {% if profile.id_verified %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill"><i class="fas fa-times"></i></span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            Address
+                            {% if profile.address_verified %}
+                            <span class="badge bg-success rounded-pill"><i class="fas fa-check"></i></span>
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill"><i class="fas fa-times"></i></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            {% if profile.verification_status == 'verified' %}
+                            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-check text-white fa-lg"></i>
+                            </div>
+                            {% elif profile.verification_status == 'pending' %}
+                            <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-clock text-white fa-lg"></i>
+                            </div>
+                            {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user text-white fa-lg"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">
+                                {% if profile.verification_status == 'verified' %}
+                                Fully Verified
+                                {% elif profile.verification_status == 'pending' %}
+                                Verification Pending
+                                {% else %}
+                                Unverified
+                                {% endif %}
+                            </h5>
+                            <p class="text-muted mb-0 small">
+                                {% if profile.verification_status == 'verified' %}
+                                This user has completed all verification steps
+                                {% elif profile.verification_status == 'pending' %}
+                                This user has submitted verification documents
+                                {% else %}
+                                This user hasn't completed verification
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Badges Section -->
+                {% if profile.badge_set.all %}
+                <div class="profile-card">
+                    <h3 class="section-title">Earned Badges</h3>
+                    <div class="badges-section">
+                        {% for badge in profile.badge_set.all %}
+                        <div class="badge-card">
+                            <div class="badge-icon">
+                                <i class="fas fa-award"></i>
+                            </div>
+                            <div class="badge-info">
+                                <h5 class="badge-title">{{ badge.name }}</h5>
+                                <p class="badge-description">{{ badge.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Perks & Benefits (if applicable) -->
+                {% if profile.perk_set.all %}
+                <div class="profile-card">
+                    <h3 class="section-title">Special Perks</h3>
+                    <ul class="list-group">
+                        {% for perk in profile.perk_set.all %}
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="fas fa-gift text-primary me-3"></i>
+                            <div>
+                                <h6 class="mb-0">{{ perk.name }}</h6>
+                                <p class="text-muted mb-0 small">{{ perk.description }}</p>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Payment Information Section (for freelancers) -->
+                {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+                <div class="profile-card">
+                    <h3 class="section-title">Payment Methods</h3>
+                    <div class="payment-methods">
+                        {% if profile.paypal_email or profile.bank_account_name or profile.wallet_address %}
+                            <div class="list-group">
+                                {% if profile.paypal_email %}
+                                <div class="list-group-item d-flex align-items-center">
+                                    <i class="fab fa-paypal text-primary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">PayPal</h6>
+                                        <p class="text-muted mb-0 small">Available</p>
+                                    </div>
+                                </div>
+                                {% if profile.paypal_qr_code %}
+                                <div class="text-center py-2">
+                                    <img src="{{ profile.paypal_qr_code.url }}" alt="PayPal QR Code" class="payment-qr-code">
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                                
+                                {% if profile.bank_account_name %}
+                                <div class="list-group-item d-flex align-items-center">
+                                    <i class="fas fa-university text-primary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Bank Transfer</h6>
+                                        <p class="text-muted mb-0 small">Available</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if profile.wallet_address %}
+                                <div class="list-group-item d-flex align-items-center">
+                                    <i class="fab fa-bitcoin text-primary me-3"></i>
+                                    <div>
+                                        <h6 class="mb-0">Cryptocurrency</h6>
+                                        <p class="text-muted mb-0 small">Available</p>
+                                    </div>
+                                </div>
+                                {% if profile.crypto_qr_code %}
+                                <div class="text-center py-2">
+                                    <img src="{{ profile.crypto_qr_code.url }}" alt="Crypto QR Code" class="payment-qr-code">
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted small">No payment methods specified.</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Languages (if applicable) -->
+                {% if profile.language_set.all %}
+                <div class="profile-card">
+                    <h3 class="section-title">Languages</h3>
+                    <ul class="list-group">
+                        {% for language in profile.language_set.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ language.name }}
+                            <span class="badge bg-primary rounded-pill">{{ language.get_proficiency_display }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Replace the Bootstrap modals with custom simple modals -->
+<!-- Rate Freelancer Modal - Simplified Custom Implementation -->
+<div id="simpleFreelancerModal" class="simple-modal">
+    <div class="simple-modal-content">
+        <span class="simple-modal-close" onclick="closeFreelancerModal()">&times;</span>
+        <div class="simple-modal-header">
+            <h3>Rate {{ profile.name }}</h3>
+        </div>
+        <div class="simple-modal-body">
+            <form id="simpleRateFreelancerForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Rating</label>
+                    <div class="rating-select">
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-rating1" value="1">
+                            <label for="simple-rating1">1</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-rating2" value="2">
+                            <label for="simple-rating2">2</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-rating3" value="3">
+                            <label for="simple-rating3">3</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-rating4" value="4">
+                            <label for="simple-rating4">4</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-rating5" value="5" checked>
+                            <label for="simple-rating5">5</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="simple-reviewText" class="form-label">Review</label>
+                    <textarea class="form-control" id="simple-reviewText" name="review" rows="4" placeholder="Write your review here..."></textarea>
+                </div>
+                <div class="simple-modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeFreelancerModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitFreelancerRating()">Submit Rating</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Rate Client Modal - Simplified Custom Implementation -->
+<div id="simpleClientModal" class="simple-modal">
+    <div class="simple-modal-content">
+        <span class="simple-modal-close" onclick="closeClientModal()">&times;</span>
+        <div class="simple-modal-header">
+            <h3>Rate {{ profile.name }}</h3>
+        </div>
+        <div class="simple-modal-body">
+            <form id="simpleRateClientForm">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Rating</label>
+                    <div class="rating-select">
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-client-rating1" value="1">
+                            <label for="simple-client-rating1">1</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-client-rating2" value="2">
+                            <label for="simple-client-rating2">2</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-client-rating3" value="3">
+                            <label for="simple-client-rating3">3</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-client-rating4" value="4">
+                            <label for="simple-client-rating4">4</label>
+                        </div>
+                        <div class="rating-option">
+                            <input type="radio" name="rating" id="simple-client-rating5" value="5" checked>
+                            <label for="simple-client-rating5">5</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="simple-clientReviewText" class="form-label">Review</label>
+                    <textarea class="form-control" id="simple-clientReviewText" name="review" rows="4" placeholder="Write your review here..."></textarea>
+                </div>
+                <div class="simple-modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeClientModal()">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitClientRating()">Submit Rating</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // SUPER SIMPLE CUSTOM MODAL JS - NO BOOTSTRAP DEPENDENCIES
+    
+    // Replace the Bootstrap modal buttons with our custom implementation
+    document.addEventListener('DOMContentLoaded', function() {
+        // Replace the existing buttons that open the Bootstrap modals and replace their click handlers
+        replaceBootstrapButtons();
+        
+        // Escape key closes modals
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeAllModals();
+            }
+        });
+        
+        // Clicking outside the modal content closes the modal
+        const modals = document.querySelectorAll('.simple-modal');
+        modals.forEach(modal => {
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeAllModals();
+                }
+            });
+        });
+    });
+    
+    function replaceBootstrapButtons() {
+        // Find buttons that would open the Bootstrap modals and replace their click handlers
+        const freelancerRateButtons = document.querySelectorAll('button[data-bs-target="#rateFreelancerModal"]');
+        freelancerRateButtons.forEach(button => {
+            button.removeAttribute('data-bs-toggle');
+            button.removeAttribute('data-bs-target');
+            button.addEventListener('click', openFreelancerModal);
+        });
+        
+        const clientRateButtons = document.querySelectorAll('button[data-bs-target="#rateClientModal"]');
+        clientRateButtons.forEach(button => {
+            button.removeAttribute('data-bs-toggle');
+            button.removeAttribute('data-bs-target');
+            button.addEventListener('click', openClientModal);
+        });
+    }
+    
+    // Modal control functions
+    function openFreelancerModal() {
+        document.getElementById('simpleFreelancerModal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+    
+    function closeFreelancerModal() {
+        document.getElementById('simpleFreelancerModal').style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+    
+    function openClientModal() {
+        document.getElementById('simpleClientModal').style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+    
+    function closeClientModal() {
+        document.getElementById('simpleClientModal').style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+    
+    function closeAllModals() {
+        closeFreelancerModal();
+        closeClientModal();
+    }
+    
+    // Form submission handlers - FIXED
+    function submitFreelancerRating() {
+        // Get form data
+        const rating = document.querySelector('input[name="rating"]:checked').value;
+        const reviewText = document.getElementById('simple-reviewText').value;
+        
+        // Create form data for submission
+        const formData = new FormData();
+        formData.append('rating', rating);
+        formData.append('review', reviewText);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        // Submit using normal form submission instead of fetch API
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'rate-freelancer' profile.id %}";
+        form.style.display = 'none';
+        
+        // Add all form data as hidden inputs
+        for (const [key, value] of formData.entries()) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+        
+        // Add form to document, submit it, and remove it
+        document.body.appendChild(form);
+        form.submit();
+        
+        // Show a temporary message while submitting
+        closeFreelancerModal();
+        showTemporaryMessage("Submitting your rating...");
+    }
+    
+    function submitClientRating() {
+        // Get form data
+        const rating = document.querySelector('#simpleClientModal input[name="rating"]:checked').value;
+        const reviewText = document.getElementById('simple-clientReviewText').value;
+        
+        // Create form data for submission
+        const formData = new FormData();
+        formData.append('rating', rating);
+        formData.append('review', reviewText);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        // Submit using normal form submission instead of fetch API
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'rate-client' profile.id %}";
+        form.style.display = 'none';
+        
+        // Add all form data as hidden inputs
+        for (const [key, value] of formData.entries()) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+        }
+        
+        // Add form to document, submit it, and remove it
+        document.body.appendChild(form);
+        form.submit();
+        
+        // Show a temporary message while submitting
+        closeClientModal();
+        showTemporaryMessage("Submitting your rating...");
+    }
+    
+    // Helper function to show a temporary message overlay
+    function showTemporaryMessage(message) {
+        // Create a message overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '50%';
+        overlay.style.left = '50%';
+        overlay.style.transform = 'translate(-50%, -50%)';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        overlay.style.color = 'white';
+        overlay.style.padding = '20px';
+        overlay.style.borderRadius = '10px';
+        overlay.style.zIndex = '10000';
+        overlay.style.textAlign = 'center';
+        overlay.innerText = message;
+        
+        // Add to document
+        document.body.appendChild(overlay);
+        
+        // Remove after a short delay
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            overlay.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+                document.body.removeChild(overlay);
+            }, 500);
+        }, 1000);
+    }
+</script>
+{% endblock %}

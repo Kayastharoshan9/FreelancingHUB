@@ -1,0 +1,272 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<!-- Main Section -->
+<main class="singleProject my-md">
+    <div class="container">
+        <div class="layout">
+            <div class="column column--1of3">
+                <h3 class="singleProject__subtitle">Job Information</h3>
+                <div class="card">
+                    <div class="settings">
+                        <h4>Status: <span class="tag tag--pill tag--sub">{{job.get_status_display}}</span></h4>
+                        <h4>Posted by: <a href="{% url 'profile-detail' job.owner.id %}">{{job.owner.name}}</a></h4>
+                        <h4>Posted on: {{job.created|date:"F j, Y"}}</h4>
+                        <h4>Budget: ${{job.budget_min}} - ${{job.budget_max}}</h4>
+                        <h4>Deadline: {{job.deadline|date:"F j, Y"}}</h4>
+                        <h4>Type: {{job.get_job_type_display}}</h4>
+                        {% if job.location %}
+                        <h4>Location: {{job.location}}</h4>
+                        {% endif %}
+                    </div>
+
+                    {% if job.owner == request.user.profile and job.status == 'open' %}
+                    <div class="settings">
+                        <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-job' job.id %}">
+                            <iconify-icon inline icon="material-symbols:edit-calendar-outline" width="18"></iconify-icon> Edit
+                        </a>
+                        <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-job' job.id %}">
+                            <iconify-icon inline icon="material-symbols:delete-outline" width="18"></iconify-icon> Delete
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <h3 class="singleProject__subtitle">Required Skills</h3>
+                <div class="card">
+                    <div class="project__tags">
+                        {% for skill in job.required_skills.all %}
+                        <span class="tag tag--pill tag--sub">
+                            <small>{{skill.name}}</small>
+                        </span>
+                        {% empty %}
+                        <p>No specific skills required</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if user.profile != job.owner and job.status == 'open' and not user_bid %}
+                <div class="card text-center my-md">
+                    <a href="{% url 'create-bid' job.id %}" class="btn btn--sub btn--lg">Submit a Bid</a>
+                </div>
+                {% endif %}
+
+                {% if user_bid %}
+                <h3 class="singleProject__subtitle">Your Bid</h3>
+                <div class="card">
+                    <div class="settings">
+                        <h4>Status: <span class="tag tag--pill {% if user_bid.status == 'accepted' %}tag--main{% else %}tag--sub{% endif %}">{{user_bid.get_status_display}}</span></h4>
+                        <h4>Amount: ${{user_bid.amount}}</h4>
+                        <h4>Delivery Time: {{user_bid.delivery_time}} days</h4>
+                        <h4>Proposal: {{user_bid.proposal|linebreaks}}</h4>
+                    </div>
+
+                    {% if user_bid.status == 'pending' %}
+                    <div class="settings">
+                        <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-bid' user_bid.id %}">
+                            <iconify-icon inline icon="material-symbols:edit-calendar-outline" width="18"></iconify-icon> Edit
+                        </a>
+                        <a class="tag tag--pill tag--main settings__btn" href="{% url 'delete-bid' user_bid.id %}">
+                            <iconify-icon inline icon="material-symbols:delete-outline" width="18"></iconify-icon> Withdraw
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="column column--2of3">
+                <div>
+                    <h3 class="singleProject__title">{{job.title}}</h3>
+                    <div class="singleProject__body">
+                        {{job.description|linebreaks}}
+                    </div>
+                </div>
+
+                {% if job.owner == request.user.profile %}
+                
+                {% if job.status == 'open' and bids %}
+                <h3 class="singleProject__subtitle">Bids</h3>
+                <div class="settings">
+                    {% for bid in bids %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4><a href="{% url 'profile-detail' bid.freelancer.id %}">{{bid.freelancer.name}}</a></h4>
+                                <p>${{bid.amount}} - {{bid.delivery_time}} days</p>
+                                <p>{{bid.proposal|linebreaks}}</p>
+                            </td>
+                            <td class="settings__tableActions">
+                                {% if bid.status == 'pending' %}
+                                <form action="{% url 'accept-bid' bid.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="tag tag--pill tag--main settings__btn">
+                                        <iconify-icon inline icon="material-symbols:check" width="18"></iconify-icon> Accept
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="tag tag--pill {% if bid.status == 'accepted' %}tag--main{% else %}tag--sub{% endif %}">
+                                    {{bid.get_status_display}}
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if job.status == 'in_progress' or job.status == 'completed' %}
+                <h3 class="singleProject__subtitle">Milestones</h3>
+                <div class="settings">
+                    <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-milestone' job.id %}">
+                        <iconify-icon inline icon="material-symbols:add" width="18"></iconify-icon> Add Milestone
+                    </a>
+                </div>
+                
+                <div class="settings">
+                    {% for milestone in job.milestones.all %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4>{{milestone.title}}</h4>
+                                <p>${{milestone.amount}} - Due: {{milestone.due_date|date:"F j, Y"}}</p>
+                                <p>{{milestone.description|linebreaks}}</p>
+                                <p>Status: <span class="tag tag--pill {% if milestone.status == 'completed' %}tag--main{% else %}tag--sub{% endif %}">
+                                    {{milestone.get_status_display}}
+                                </span></p>
+                            </td>
+                            <td class="settings__tableActions">
+                                {% if milestone.status != 'completed' %}
+                                <a class="tag tag--pill tag--main settings__btn" href="{% url 'update-milestone' milestone.id %}">
+                                    <iconify-icon inline icon="material-symbols:edit-calendar-outline" width="18"></iconify-icon> Edit
+                                </a>
+                                <a class="tag tag--pill tag--main settings__btn" href="{% url 'create-payment' milestone.id %}">
+                                    <iconify-icon inline icon="material-symbols:payments-outline" width="18"></iconify-icon> Pay
+                                </a>
+                                <form action="{% url 'complete-milestone' milestone.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="tag tag--pill tag--main settings__btn">
+                                        <iconify-icon inline icon="material-symbols:check" width="18"></iconify-icon> Complete
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                    {% empty %}
+                    <p>No milestones created yet</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if job.status == 'completed' %}
+                <h3 class="singleProject__subtitle">Reviews</h3>
+                <div class="settings">
+                    {% if not job.client_reviews.all %}
+                    <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-client-review' job.id %}">
+                        <iconify-icon inline icon="material-symbols:rate-review" width="18"></iconify-icon> Review Freelancer
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <div class="settings">
+                    {% for review in job.client_reviews.all %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4>Client Review</h4>
+                                <p>Rating: {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <iconify-icon inline icon="material-symbols:star" width="18"></iconify-icon>
+                                    {% else %}
+                                    <iconify-icon inline icon="material-symbols:star-outline" width="18"></iconify-icon>
+                                    {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p>{{review.comment|linebreaks}}</p>
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                    
+                    {% for review in job.freelancer_reviews.all %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4>Freelancer Review</h4>
+                                <p>Rating: {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <iconify-icon inline icon="material-symbols:star" width="18"></iconify-icon>
+                                    {% else %}
+                                    <iconify-icon inline icon="material-symbols:star-outline" width="18"></iconify-icon>
+                                    {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p>{{review.comment|linebreaks}}</p>
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% endif %}
+                
+                {% if user.profile != job.owner and job.status == 'completed' and user_bid.status == 'accepted' %}
+                <h3 class="singleProject__subtitle">Reviews</h3>
+                <div class="settings">
+                    {% if not job.freelancer_reviews.all %}
+                    <a class="tag tag--pill tag--sub settings__btn tag--lg" href="{% url 'create-freelancer-review' job.id %}">
+                        <iconify-icon inline icon="material-symbols:rate-review" width="18"></iconify-icon> Review Client
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <div class="settings">
+                    {% for review in job.freelancer_reviews.all %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4>Freelancer Review</h4>
+                                <p>Rating: {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <iconify-icon inline icon="material-symbols:star" width="18"></iconify-icon>
+                                    {% else %}
+                                    <iconify-icon inline icon="material-symbols:star-outline" width="18"></iconify-icon>
+                                    {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p>{{review.comment|linebreaks}}</p>
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                    
+                    {% for review in job.client_reviews.all %}
+                    <table class="settings__table">
+                        <tr>
+                            <td class="settings__tableInfo">
+                                <h4>Client Review</h4>
+                                <p>Rating: {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                    <iconify-icon inline icon="material-symbols:star" width="18"></iconify-icon>
+                                    {% else %}
+                                    <iconify-icon inline icon="material-symbols:star-outline" width="18"></iconify-icon>
+                                    {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <p>{{review.comment|linebreaks}}</p>
+                            </td>
+                        </tr>
+                    </table>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

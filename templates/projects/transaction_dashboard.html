@@ -1,0 +1,514 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Transaction Dashboard | FreelanceHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        padding: 20px;
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-card .stats-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .stats-card .stats-icon.bg-primary {
+        background: linear-gradient(45deg, #4a00e0, #8e2de2);
+    }
+    
+    .stats-card .stats-icon.bg-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+    }
+    
+    .stats-card .stats-icon.bg-info {
+        background: linear-gradient(45deg, #17a2b8, #0dcaf0);
+    }
+    
+    .stats-card .stats-icon.bg-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+    }
+    
+    .stats-card .stats-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .stats-card .stats-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .transaction-table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(74, 0, 224, 0.03);
+    }
+    
+    .badge-escrow {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    
+    .badge-released {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .badge-pending {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .badge-refunded {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .tab-pane {
+        padding: 20px 0;
+    }
+    
+    .nav-tabs .nav-link {
+        color: #495057;
+    }
+    
+    .nav-tabs .nav-link.active {
+        font-weight: 600;
+        color: #4a00e0;
+        border-bottom: 2px solid #4a00e0;
+    }
+    
+    .transaction-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .transaction-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .transaction-header {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .transaction-body {
+        padding: 20px;
+    }
+    
+    .transaction-footer {
+        padding: 15px 20px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .transaction-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .transaction-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .user-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .user-info img {
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <h1 class="mb-4">Transaction Dashboard</h1>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-success">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="stats-amount">${{ stats.total_received|floatformat:2 }}</div>
+                <div class="stats-label">Total Received</div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-primary">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="stats-amount">${{ stats.total_paid|floatformat:2 }}</div>
+                <div class="stats-label">Total Paid</div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-info">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="stats-amount">
+                    {% if profile.user_type == 'client' %}
+                        ${{ stats.in_escrow_client|floatformat:2 }}
+                    {% else %}
+                        ${{ stats.in_escrow_freelancer|floatformat:2 }}
+                    {% endif %}
+                </div>
+                <div class="stats-label">In Escrow</div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon bg-warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-amount">
+                    {% if profile.user_type == 'client' %}
+                        {{ stats.pending_release }}
+                    {% else %}
+                        {{ stats.pending_completion }}
+                    {% endif %}
+                </div>
+                <div class="stats-label">
+                    {% if profile.user_type == 'client' %}
+                        Pending Release
+                    {% else %}
+                        Pending Completion
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transactions Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="transactionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#all" role="tab" aria-controls="all" aria-selected="true">All Transactions</a>
+                </li>
+                {% if profile.user_type == 'client' or profile.user_type == 'both' %}
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="sent-tab" data-bs-toggle="tab" href="#sent" role="tab" aria-controls="sent" aria-selected="false">Payments Sent</a>
+                </li>
+                {% endif %}
+                {% if profile.user_type == 'freelancer' or profile.user_type == 'both' %}
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="received-tab" data-bs-toggle="tab" href="#received" role="tab" aria-controls="received" aria-selected="false">Payments Received</a>
+                </li>
+                {% endif %}
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="escrow-tab" data-bs-toggle="tab" href="#escrow" role="tab" aria-controls="escrow" aria-selected="false">In Escrow</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="transactionTabsContent">
+                <!-- All Transactions Tab -->
+                <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                    {% if transaction_history %}
+                        <div class="table-responsive">
+                            <table class="table table-hover transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Milestone</th>
+                                        <th>Job</th>
+                                        <th>From/To</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in transaction_history %}
+                                    <tr>
+                                        <td>{{ payment.created|date:"M d, Y" }}</td>
+                                        <td>{{ payment.milestone.title }}</td>
+                                        <td>
+                                            <a href="{% url 'job' pk=payment.milestone.job.id %}">{{ payment.milestone.job.title|truncatechars:30 }}</a>
+                                        </td>
+                                        <td>
+                                            {% if payment.client == profile %}
+                                                <div class="user-info">
+                                                    <img src="{{ payment.freelancer.imageURL }}" alt="{{ payment.freelancer.name }}" class="avatar-sm">
+                                                    <span>{{ payment.freelancer.name }}</span>
+                                                </div>
+                                            {% else %}
+                                                <div class="user-info">
+                                                    <img src="{{ payment.client.imageURL }}" alt="{{ payment.client.name }}" class="avatar-sm">
+                                                    <span>{{ payment.client.name }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if payment.status == 'escrow' and payment.milestone.is_completed and payment.client == profile %}
+                                                <a href="{% url 'review-and-release' job_id=payment.milestone.job.id milestone_id=payment.milestone.id %}" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-paper-plane me-1"></i>Review & Release
+                                                </a>
+                                            {% elif payment.status == 'escrow' and not payment.milestone.is_completed and payment.freelancer == profile %}
+                                                <a href="{% url 'complete-milestone' pk=payment.milestone.id %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-check me-1"></i>Mark Complete
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No transaction history found.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Payments Sent Tab -->
+                <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                    {% if client_payments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Milestone</th>
+                                        <th>Job</th>
+                                        <th>To</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in client_payments %}
+                                    <tr>
+                                        <td>{{ payment.created|date:"M d, Y" }}</td>
+                                        <td>{{ payment.milestone.title }}</td>
+                                        <td>
+                                            <a href="{% url 'job' pk=payment.milestone.job.id %}">{{ payment.milestone.job.title|truncatechars:30 }}</a>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <img src="{{ payment.freelancer.imageURL }}" alt="{{ payment.freelancer.name }}" class="avatar-sm">
+                                                <span>{{ payment.freelancer.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if payment.status == 'escrow' and payment.milestone.is_completed %}
+                                                <a href="{% url 'review-and-release' job_id=payment.milestone.job.id milestone_id=payment.milestone.id %}" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-paper-plane me-1"></i>Review & Release
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You haven't made any payments yet.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Payments Received Tab -->
+                <div class="tab-pane fade" id="received" role="tabpanel" aria-labelledby="received-tab">
+                    {% if freelancer_payments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Milestone</th>
+                                        <th>Job</th>
+                                        <th>From</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in freelancer_payments %}
+                                    <tr>
+                                        <td>{{ payment.created|date:"M d, Y" }}</td>
+                                        <td>{{ payment.milestone.title }}</td>
+                                        <td>
+                                            <a href="{% url 'job' pk=payment.milestone.job.id %}">{{ payment.milestone.job.title|truncatechars:30 }}</a>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <img src="{{ payment.client.imageURL }}" alt="{{ payment.client.name }}" class="avatar-sm">
+                                                <span>{{ payment.client.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ payment.status }}">{{ payment.get_status_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if payment.status == 'escrow' and not payment.milestone.is_completed %}
+                                                <a href="{% url 'complete-milestone' pk=payment.milestone.id %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-check me-1"></i>Mark Complete
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>You haven't received any payments yet.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- In Escrow Tab -->
+                <div class="tab-pane fade" id="escrow" role="tabpanel" aria-labelledby="escrow-tab">
+                    {% if client_escrow_payments or freelancer_escrow_payments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover transaction-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Milestone</th>
+                                        <th>Job</th>
+                                        <th>Client/Freelancer</th>
+                                        <th>Amount</th>
+                                        <th>Milestone Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in client_escrow_payments %}
+                                    <tr>
+                                        <td>{{ payment.created|date:"M d, Y" }}</td>
+                                        <td>{{ payment.milestone.title }}</td>
+                                        <td>
+                                            <a href="{% url 'job' pk=payment.milestone.job.id %}">{{ payment.milestone.job.title|truncatechars:30 }}</a>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <img src="{{ payment.freelancer.imageURL }}" alt="{{ payment.freelancer.name }}" class="avatar-sm">
+                                                <span>{{ payment.freelancer.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>
+                                            {% if payment.milestone.is_completed %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">In Progress</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if payment.milestone.is_completed %}
+                                                <a href="{% url 'review-and-release' job_id=payment.milestone.job.id milestone_id=payment.milestone.id %}" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-paper-plane me-1"></i>Review & Release
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                    {% for payment in freelancer_escrow_payments %}
+                                    <tr>
+                                        <td>{{ payment.created|date:"M d, Y" }}</td>
+                                        <td>{{ payment.milestone.title }}</td>
+                                        <td>
+                                            <a href="{% url 'job' pk=payment.milestone.job.id %}">{{ payment.milestone.job.title|truncatechars:30 }}</a>
+                                        </td>
+                                        <td>
+                                            <div class="user-info">
+                                                <img src="{{ payment.client.imageURL }}" alt="{{ payment.client.name }}" class="avatar-sm">
+                                                <span>{{ payment.client.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>${{ payment.amount|floatformat:2 }}</td>
+                                        <td>
+                                            {% if payment.milestone.is_completed %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">In Progress</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if not payment.milestone.is_completed %}
+                                                <a href="{% url 'complete-milestone' pk=payment.milestone.id %}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-check me-1"></i>Mark Complete
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No payments currently in escrow.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %} 

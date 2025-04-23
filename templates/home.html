@@ -1,0 +1,253 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Connect with top freelancers & projects</h1>
+                <p class="lead mb-4">FreelanceHub is a comprehensive freelancing platform connecting skilled professionals with clients and projects worldwide.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4 me-md-2">Get Started</a>
+                    <a href="{% url 'projects' %}" class="btn btn-outline-light btn-lg px-4">Browse Projects</a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="{% static 'images/hero-image.svg' %}" alt="Freelance Platform" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Platform Features</h2>
+            <p class="lead text-muted">Everything you need for successful freelancing</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-briefcase fa-2x text-primary"></i>
+                        </div>
+                        <h4>Job Board</h4>
+                        <p class="text-muted">Browse or post jobs with detailed requirements, budgets, and deadlines.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-check fa-2x text-primary"></i>
+                        </div>
+                        <h4>Talent Profiles</h4>
+                        <p class="text-muted">Create comprehensive portfolios showcasing your skills and previous work.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-comments fa-2x text-primary"></i>
+                        </div>
+                        <h4>Messaging System</h4>
+                        <p class="text-muted">Built-in communication tools for seamless client-freelancer interaction.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-hand-holding-usd fa-2x text-primary"></i>
+                        </div>
+                        <h4>Secure Payments</h4>
+                        <p class="text-muted">Escrow payments system with milestone-based releases for security.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-star fa-2x text-primary"></i>
+                        </div>
+                        <h4>Reviews & Ratings</h4>
+                        <p class="text-muted">Transparent feedback system for both freelancers and clients.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="bg-light p-3 rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-tasks fa-2x text-primary"></i>
+                        </div>
+                        <h4>Project Management</h4>
+                        <p class="text-muted">Tools for tracking progress, managing milestones, and ensuring timely delivery.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How It Works</h2>
+            <p class="lead text-muted">Simple steps to start freelancing or hiring</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">1</div>
+                        <h4>Create Account</h4>
+                        <p class="text-muted">Sign up as a freelancer or client to get started</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">2</div>
+                        <h4>Complete Profile</h4>
+                        <p class="text-muted">Add your skills, portfolio, and project preferences</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">3</div>
+                        <h4>Post or Apply</h4>
+                        <p class="text-muted">Post jobs as a client or submit proposals as a freelancer</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 h-100">
+                    <div class="card-body text-center">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">4</div>
+                        <h4>Collaborate</h4>
+                        <p class="text-muted">Work together and securely process payments</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Featured Projects</h2>
+            <a href="{% url 'projects' %}" class="btn btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="row g-4">
+            {% for project in featured_projects %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ project.imageURL }}" class="card-img-top" alt="{{ project.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ project.title }}</h5>
+                        <p class="text-muted mb-2">By {{ project.owner.name }}</p>
+                        <p class="card-text">{{ project.description|truncatechars:100 }}</p>
+                        <div class="d-flex flex-wrap gap-1 mb-3">
+                            {% for tag in project.tags.all %}
+                            <span class="badge bg-light text-dark">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted"><i class="fas fa-thumbs-up me-1"></i>{{ project.vote_total }} votes</small>
+                        </div>
+                        <a href="{% url 'project' project.id %}" class="btn btn-sm btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <p class="text-muted">No featured projects found</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Latest Jobs -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Latest Job Opportunities</h2>
+            <a href="{% url 'jobs' %}" class="btn btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="row g-4">
+            {% for job in latest_jobs %}
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ job.title }}</h5>
+                        <p class="text-muted mb-2">Posted by {{ job.owner.name }} • {{ job.created|timesince }} ago</p>
+                        <p class="card-text mb-3">{{ job.description|truncatechars:150 }}</p>
+                        <div class="d-flex flex-wrap gap-1 mb-3">
+                            {% for skill in job.required_skills.all %}
+                            <span class="badge bg-light text-dark">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="badge bg-success">{{ job.get_job_type_display }}</span>
+                                <span class="badge bg-info text-dark">${{ job.budget_min }} - ${{ job.budget_max }}</span>
+                            </div>
+                            <a href="{% url 'job' job.id %}" class="btn btn-sm btn-primary">View Job</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <p class="text-muted">No jobs posted yet</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-3">Ready to start your freelancing journey?</h2>
+        <p class="lead mb-4">Join thousands of freelancers and clients already using FreelanceHub</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4">Sign Up Now</a>
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4">Login</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

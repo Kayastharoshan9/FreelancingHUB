@@ -1,0 +1,195 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block title %}Fund Milestone - {{ milestone.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .payment-card {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .payment-summary {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+    
+    .summary-total {
+        font-weight: bold;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 2px solid #ddd;
+    }
+    
+    #payment-form {
+        margin-top: 30px;
+    }
+    
+    #card-element {
+        padding: 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: white;
+    }
+    
+    #card-errors {
+        color: #dc3545;
+        margin-top: 10px;
+    }
+    
+    .payment-btn {
+        margin-top: 20px;
+    }
+    
+    .escrow-info {
+        background-color: #e9f7fe;
+        border-left: 4px solid #3498db;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container payment-container my-5">
+    <div class="payment-card">
+        <div class="mb-4">
+            <a href="{% url 'job' pk=job.id %}" class="text-decoration-none">
+                <i class="fas fa-arrow-left me-2"></i>Back to Job
+            </a>
+        </div>
+        
+        <h2 class="mb-4">Fund Milestone: {{ milestone.title }}</h2>
+        
+        <div class="escrow-info">
+            <h5><i class="fas fa-lock me-2"></i>Secure Escrow Payment</h5>
+            <p class="mb-0">
+                Your payment will be held in escrow until the milestone is completed and you approve the release of funds.
+                This protects both you and the freelancer during the project.
+            </p>
+        </div>
+        
+        <div class="payment-summary">
+            <h4 class="mb-3">Payment Summary</h4>
+            <div class="summary-item">
+                <span>Job:</span>
+                <span>{{ job.title }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Milestone:</span>
+                <span>{{ milestone.title }}</span>
+            </div>
+            {% if milestone.due_date %}
+            <div class="summary-item">
+                <span>Due Date:</span>
+                <span>{{ milestone.due_date|date:"M d, Y" }}</span>
+            </div>
+            {% endif %}
+            <div class="summary-item summary-total">
+                <span>Total Amount:</span>
+                <span>${{ milestone.amount }}</span>
+            </div>
+        </div>
+        
+        <form id="payment-form">
+            <div class="mb-3">
+                <label for="card-element" class="form-label">Credit or Debit Card</label>
+                <div id="card-element">
+                    <!-- Stripe.js will insert the card element here -->
+                </div>
+                <div id="card-errors" role="alert"></div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" id="submit-button" class="btn btn-primary payment-btn">
+                    <i class="fas fa-lock me-2"></i>Pay ${{ milestone.amount }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create a Stripe client
+        const stripe = Stripe('{{ stripe_publishable_key }}');
+        const clientSecret = '{{ client_secret }}';
+        
+        // Create an instance of Elements
+        const elements = stripe.elements();
+        
+        // Create and mount the card Element
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+        
+        // Handle form submission
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            // Disable the submit button to prevent repeated clicks
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            
+            try {
+                const result = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                    }
+                });
+                
+                if (result.error) {
+                    // Show error to your customer
+                    const errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                    
+                    // Re-enable the submit button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-lock me-2"></i>Pay ${{ milestone.amount }}';
+                } else {
+                    // Payment succeeded!
+                    window.location.href = "{% url 'payment-success' milestone_id=milestone.id %}";
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Show error to your customer
+                const errorElement = document.getElementById('card-errors');
+                errorElement.textContent = 'An unexpected error occurred. Please try again.';
+                
+                // Re-enable the submit button
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-lock me-2"></i>Pay ${{ milestone.amount }}';
+            }
+        });
+    });
+</script>
+{% endblock %}
